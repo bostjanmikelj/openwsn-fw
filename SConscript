@@ -185,7 +185,7 @@ elif env['toolchain']=='iar-proj':
     
 elif env['toolchain']=='armgcc':
     
-    if env['board'] not in ['OpenMote-CC2538','iot-lab_M3']:
+    if env['board'] not in ['OpenMote-CC2538','iot-lab_M3','VESNA']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
     if   env['board']=='OpenMote-CC2538':
@@ -276,6 +276,59 @@ elif env['toolchain']=='armgcc':
         env.Replace(NM           = 'arm-none-eabi-nm')
         env.Replace(SIZE         = 'arm-none-eabi-size')
         
+    elif env['board']=='VESNA':
+          # compiler (C)
+        env.Replace(CC           = 'arm-none-eabi-gcc')
+        if os.name=='nt':
+            env.Append(CCFLAGS   = '-DHSE_VALUE=((uint32_t)16000000)')
+        else:
+            env.Append(CCFLAGS   = '-DHSE_VALUE=\\(\\(uint32_t\\)16000000\\)')
+        env.Append(CCFLAGS       = '-DSTM32F10X_HD')
+        env.Append(CCFLAGS       = '-DUSE_STDPERIPH_DRIVER')
+        env.Append(CCFLAGS       = '-ggdb')
+        env.Append(CCFLAGS       = '-g3')
+        env.Append(CCFLAGS       = '-std=gnu99')
+        env.Append(CCFLAGS       = '-O0')
+        env.Append(CCFLAGS       = '-Wall')
+        env.Append(CCFLAGS       = '-Wstrict-prototypes')
+        env.Append(CCFLAGS       = '-mcpu=cortex-m3')
+        env.Append(CCFLAGS       = '-mlittle-endian')
+        env.Append(CCFLAGS       = '-mthumb')
+        env.Append(CCFLAGS       = '-mthumb-interwork')
+        env.Append(CCFLAGS       = '-nostartfiles')
+        # compiler (C++)
+        env.Replace(CXX          = 'arm-none-eabi-g++')
+        # assembler
+        env.Replace(AS           = 'arm-none-eabi-as')
+        env.Append(ASFLAGS       = '-ggdb -g3 -mcpu=cortex-m3 -mlittle-endian')
+        # linker
+        env.Append(LINKFLAGS     = '-DUSE_STDPERIPH_DRIVER')
+        env.Append(LINKFLAGS     = '-DUSE_STM32_DISCOVERY')
+        env.Append(LINKFLAGS     = '-g3')
+        env.Append(LINKFLAGS     = '-ggdb')
+        env.Append(LINKFLAGS     = '-mcpu=cortex-m3')
+        env.Append(LINKFLAGS     = '-mlittle-endian')
+        env.Append(LINKFLAGS     = '-static')
+        env.Append(LINKFLAGS     = '-lgcc')
+        env.Append(LINKFLAGS     = '-mthumb')
+        env.Append(LINKFLAGS     = '-mthumb-interwork')
+        env.Append(LINKFLAGS     = '-nostartfiles')
+        env.Append(LINKFLAGS     = '-Tbsp/boards/VESNA/stm32_flash.ld')
+        env.Append(LINKFLAGS     = os.path.join('build','VESNA_armgcc','bsp','boards','VESNA','startup.o'))
+        env.Append(LINKFLAGS     = os.path.join('build','VESNA_armgcc','bsp','boards','VESNA','configure','stm32f10x_it.o'))
+        # object manipulation
+        env.Replace(OBJCOPY      = 'arm-none-eabi-objcopy')
+        env.Replace(OBJDUMP      = 'arm-none-eabi-objdump')
+        # archiver
+        env.Replace(AR           = 'arm-none-eabi-ar')
+        env.Append(ARFLAGS       = '')
+        env.Replace(RANLIB       = 'arm-none-eabi-ranlib')
+        env.Append(RANLIBFLAGS   = '')
+        # misc
+        env.Replace(NM           = 'arm-none-eabi-nm')
+        env.Replace(SIZE         = 'arm-none-eabi-size')
+        
+        
     else:
         raise SystemError('unexpected board={0}'.format(env['board']))
     
@@ -348,6 +401,12 @@ def jtagUploadFunc(location):
                 suffix      = '.phonyupload',
                 src_suffix  = '.ihex',
             )
+        elif env['board'] in ['VESNA']:
+        	return Builder(
+            	action      = os.path.join('bsp','boards','VESNA','tools','flash.sh') + " $SOURCE",
+            	suffix      = '.phonyupload',
+            	src_suffix  = '.ihex',
+        	)
     else:
         if env['fet_version']==2:
             # MSP-FET430uif is running v2 Firmware

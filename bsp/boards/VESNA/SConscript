@@ -17,7 +17,7 @@ rf231 = localEnv.SConscript(
 )
 
 target   = 'libbsp'
-bsp_dir  = os.path.join('#','bsp','boards','iot-lab_M3')
+bsp_dir  = os.path.join('#','bsp','boards','VESNA')
 source   = \
     Glob('*.c') + \
     Glob('*.s') + \

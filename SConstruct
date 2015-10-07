@@ -92,6 +92,7 @@ command_line_options = {
         'OpenMote-CC2538',
         'openmotestm',
         'iot-lab_M3',
+        'VESNA',
         'agilefox',
         # misc.
         'python',
