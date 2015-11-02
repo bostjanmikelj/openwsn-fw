@@ -41,7 +41,7 @@
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void NMIException(void)
+void NMI_Handler(void)
 {
 }
 
@@ -52,7 +52,7 @@ void NMIException(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void HardFaultException(void)
+void HardFault_Handler(void)
 {
   /* Go to infinite loop when Hard Fault exception occurs */
   while (1)
@@ -67,7 +67,7 @@ void HardFaultException(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void MemManageException(void)
+void MemManage_Handler(void)
 {
   /* Go to infinite loop when Memory Manage exception occurs */
   while (1)
@@ -82,7 +82,7 @@ void MemManageException(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void BusFaultException(void)
+void BusFault_Handler(void)
 {
   /* Go to infinite loop when Bus Fault exception occurs */
   while (1)
@@ -97,7 +97,7 @@ void BusFaultException(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void UsageFaultException(void)
+void UsageFault_Handler(void)
 {
   /* Go to infinite loop when Usage Fault exception occurs */
   while (1)
@@ -112,7 +112,7 @@ void UsageFaultException(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void DebugMonitor(void)
+void DebugMon_Handler(void)
 {
 }
 
@@ -123,7 +123,7 @@ void DebugMonitor(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void SVCHandler(void)
+void SVC_Handler(void)
 {
 }
 
@@ -134,7 +134,7 @@ void SVCHandler(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void PendSVC(void)
+void PendSV_Handler(void)
 {
 }
 
@@ -145,8 +145,9 @@ void PendSVC(void)
 * Output         : None
 * Return         : None
 *******************************************************************************/
-void SysTickHandler(void)
+void SysTick_Handler(void)
 {
+	leds_indToggle();
 }
 
 /*******************************************************************************
