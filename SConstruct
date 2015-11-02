@@ -79,6 +79,8 @@ help-option:
 
 #============================ options =========================================
 
+ 
+
 # first value is default
 command_line_options = {
     'board':       [
@@ -220,7 +222,6 @@ command_line_vars.AddVariables(
         None,                                              # converter
     ),
 )
-
 if os.name=='nt':
     env = Environment(
         tools     = ['mingw'],
@@ -240,11 +241,9 @@ else:
     else:
         env = Environment(
             variables = command_line_vars
-        )
-
+        )  
 def default(env,target,source): print SCons.Script.help_text
 Default(env.Command('default', None, default))
-
 #============================ verbose =========================================
 
 if not env['verbose']:
@@ -269,24 +268,23 @@ env['targets'] = {
 # include docs SConscript
 env.SConscript(
     os.path.join('docs','SConscript'),
-    exports = ['env'],
+    exports = ['env'],	 #export list of variable names to Sconsript file
 )
 
 # include main SConscript
 # which will discover targets for this board/toolchain
 env.SConscript(
     'SConscript',
-    exports = ['env'],
+    exports = ['env'],	#export list of variable names to Sconsript file
 )
 
 # declare target group alias
 for k,v in env['targets'].items():
    Alias(k,v)
-
+   
 #============================ admin targets ===================================
 
 #===== list
-
 def listFunction(env,target,source):
     output  = []
     output += ['\n']
@@ -297,6 +295,7 @@ def listFunction(env,target,source):
         for t in v:
             output += ['    - {0}'.format(t)]
     output = '\n'.join(output)
+    print 'below output will be printed'
     print output
 list = env.Command('list', None, listFunction)
 AlwaysBuild(list)

@@ -7,11 +7,9 @@ import distutils.sysconfig
 import sconsUtils
 
 Import('env')
-
 # directory where we put object and linked files
 # WARNING: -c (clean) removes the VARDIR, so it cannot be blank
 env['VARDIR']  = os.path.join('#','build','{0}_{1}'.format(env['board'],env['toolchain']))
-
 # common include paths
 if env['board']!='python':
     env.Append(
@@ -25,7 +23,6 @@ if env['board']!='python':
             os.path.join('#','openstack'),
         ]
     )
-
 #============================ toolchain =======================================
 
 # dummy
@@ -40,7 +37,7 @@ if   env['plugfest']==1:
         env.Append(CPPDEFINES    = 'NOADAPTIVESYNC')
 
 if   env['toolchain']=='mspgcc':
-    
+    print 'mspgcc toolchain\n'
     if env['board'] not in ['telosb','wsn430v13b','wsn430v14','gina','z1']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
@@ -79,7 +76,7 @@ if   env['toolchain']=='mspgcc':
     env.Append(BUILDERS = {'PrintSize' : printSizeFunc})
 
 elif env['toolchain']=='iar':
-    
+    print 'iar toolchain\n'
     if env['board'] not in ['telosb','wsn430v13b','wsn430v14','gina','z1']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
@@ -154,7 +151,7 @@ elif env['toolchain']=='iar':
     env.Append(BUILDERS = {'PrintSize' : dummyFunc})
 
 elif env['toolchain']=='iar-proj':
-    
+    print 'iar-proj toolchain\n'
     if env['board'] not in ['telosb','gina','wsn430v13b','wsn430v14','z1','openmotestm','agilefox','OpenMote-CC2538']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
@@ -184,12 +181,10 @@ elif env['toolchain']=='iar-proj':
     env.Append(BUILDERS = {'PrintSize' : dummyFunc})
     
 elif env['toolchain']=='armgcc':
-    
     if env['board'] not in ['OpenMote-CC2538','iot-lab_M3','VESNA']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
     if   env['board']=='OpenMote-CC2538':
-        
         # compiler (C)
         env.Replace(CC           = 'arm-none-eabi-gcc')
         env.Append(CCFLAGS       = '-O0')
@@ -224,7 +219,6 @@ elif env['toolchain']=='armgcc':
         env.Replace(SIZE         = 'arm-none-eabi-size')
         
     elif env['board']=='iot-lab_M3':
-        
          # compiler (C)
         env.Replace(CC           = 'arm-none-eabi-gcc')
         if os.name=='nt':
@@ -234,7 +228,6 @@ elif env['toolchain']=='armgcc':
         env.Append(CCFLAGS       = '-DSTM32F10X_HD')
         env.Append(CCFLAGS       = '-DUSE_STDPERIPH_DRIVER')
         env.Append(CCFLAGS       = '-ggdb')
-        env.Append(CCFLAGS       = '-g3')
         env.Append(CCFLAGS       = '-std=gnu99')
         env.Append(CCFLAGS       = '-O0')
         env.Append(CCFLAGS       = '-Wall')
@@ -280,45 +273,54 @@ elif env['toolchain']=='armgcc':
           # compiler (C)
         env.Replace(CC           = 'arm-none-eabi-gcc')
         if os.name=='nt':
-            env.Append(CCFLAGS   = '-DHSE_VALUE=((uint32_t)16000000)')
+            env.Append(CCFLAGS   = '-DHSE_VALUE=((uint32_t)16000000)')        
         else:
-            env.Append(CCFLAGS   = '-DHSE_VALUE=\\(\\(uint32_t\\)16000000\\)')
+            env.Append(CCFLAGS   = '-DHSE_VALUE=\\(\\(uint32_t\\)16000000\\)') 
+            
+        env.Append(CCFLAGS       = '-mcpu=cortex-m3')     
+        env.Append(CCFLAGS       = '-mthumb')
+        env.Append(CCFLAGS    	 = '-mlittle-endian')   
+        env.Append(CCFLAGS       = '-Wall')
+        env.Append(CCFLAGS       = '-W')
+        env.Append(CCFLAGS       = '-Wshadow')
+        env.Append(CCFLAGS       = '-Wwrite-strings')
+        env.Append(CCFLAGS       = '-Winline')
+        env.Append(CCFLAGS       = '-Werror=implicit-function-declaration')
+        env.Append(CCFLAGS       = '-fno-strict-aliasing')
+        env.Append(CCFLAGS       = '-ggdb')
+        env.Append(CCFLAGS       = '-O0')
+        env.Append(CCFLAGS       = '-ffunction-sections')
+        env.Append(CCFLAGS       = '-fdata-sections')
         env.Append(CCFLAGS       = '-DSTM32F10X_HD')
         env.Append(CCFLAGS       = '-DUSE_STDPERIPH_DRIVER')
-        env.Append(CCFLAGS       = '-ggdb')
-        env.Append(CCFLAGS       = '-g3')
         env.Append(CCFLAGS       = '-std=gnu99')
-        env.Append(CCFLAGS       = '-O0')
-        env.Append(CCFLAGS       = '-Wall')
-        env.Append(CCFLAGS       = '-Wstrict-prototypes')
-        env.Append(CCFLAGS       = '-mcpu=cortex-m3')
-        env.Append(CCFLAGS       = '-mlittle-endian')
-        env.Append(CCFLAGS       = '-mthumb')
-        env.Append(CCFLAGS       = '-mthumb-interwork')
-        env.Append(CCFLAGS       = '-nostartfiles')
         # compiler (C++)
         env.Replace(CXX          = 'arm-none-eabi-g++')
-        # assembler
-        env.Replace(AS           = 'arm-none-eabi-as')
-        env.Append(ASFLAGS       = '-ggdb -g3 -mcpu=cortex-m3 -mlittle-endian')
-        # linker
-        env.Append(LINKFLAGS     = '-DUSE_STDPERIPH_DRIVER')
-        env.Append(LINKFLAGS     = '-DUSE_STM32_DISCOVERY')
+         # linker
+        env.Replace(LINK         = 'arm-none-eabi-gcc')
         env.Append(LINKFLAGS     = '-g3')
         env.Append(LINKFLAGS     = '-ggdb')
         env.Append(LINKFLAGS     = '-mcpu=cortex-m3')
-        env.Append(LINKFLAGS     = '-mlittle-endian')
-        env.Append(LINKFLAGS     = '-static')
-        env.Append(LINKFLAGS     = '-lgcc')
         env.Append(LINKFLAGS     = '-mthumb')
-        env.Append(LINKFLAGS     = '-mthumb-interwork')
+        env.Append(LINKFLAGS     = '-mlittle-endian')
+        env.Append(LINKFLAGS     = '-DUSE_STDPERIPH_DRIVER')
+        env.Append(LINKFLAGS     = '-DSTM32F10X_HD')
+        env.Append(LINKFLAGS     = '-lgcc')
+        env.Append(LINKFLAGS     = '-lc')
+        env.Append(LINKFLAGS     = '-lm')
+        env.Append(LINKFLAGS     = '-Wl,--gc-sections,-u,Reset_Handler ')
+        env.Append(LINKFLAGS     = '-Wl,--entry=Reset_Handler')
         env.Append(LINKFLAGS     = '-nostartfiles')
-        env.Append(LINKFLAGS     = '-Tbsp/boards/VESNA/stm32_flash.ld')
+        env.Append(LINKFLAGS     = '-Tbsp/boards/VESNA/STM32_512K_64K_FLASH.ld')
         env.Append(LINKFLAGS     = os.path.join('build','VESNA_armgcc','bsp','boards','VESNA','startup.o'))
         env.Append(LINKFLAGS     = os.path.join('build','VESNA_armgcc','bsp','boards','VESNA','configure','stm32f10x_it.o'))
+        # assembler
+        env.Replace(AS           = 'arm-none-eabi-as')
+        env.Append(ASFLAGS       = '-ggdb -g3 -mcpu=cortex-m3 -mlittle-endian')  
         # object manipulation
         env.Replace(OBJCOPY      = 'arm-none-eabi-objcopy')
         env.Replace(OBJDUMP      = 'arm-none-eabi-objdump')
+        env.Append(OBJDUMPFLAGS  = '-S')
         # archiver
         env.Replace(AR           = 'arm-none-eabi-ar')
         env.Append(ARFLAGS       = '')
@@ -338,15 +340,20 @@ elif env['toolchain']=='armgcc':
        suffix = '.ihex',
     )
     env.Append(BUILDERS = {'Elf2iHex'  : elf2iHexFunc})
-    
+    # converts ELF to bin
+    elf2iBinFunc = Builder (
+    	action = 'arm-none-eabi-objcopy -O binary $SOURCE $TARGET',
+    	suffix = '.bin',
+    	#src_suffix = '.elf',
+    )
     # convert ELF to bin
-    env.Append(BUILDERS = {'Elf2iBin'  : dummyFunc})
+    env.Append(BUILDERS = {'Elf2iBin'  : elf2iBinFunc})
     
     # print sizes
     env.Append(BUILDERS = {'PrintSize' : dummyFunc})
 
 elif env['toolchain']=='gcc':
-    
+    print 'gcc toolchain\n'
     if env['board'] not in ['python']:
         raise SystemError('toolchain {0} can not be used for board {1}'.format(env['toolchain'],env['board']))
     
@@ -401,12 +408,6 @@ def jtagUploadFunc(location):
                 suffix      = '.phonyupload',
                 src_suffix  = '.ihex',
             )
-        elif env['board'] in ['VESNA']:
-        	return Builder(
-            	action      = os.path.join('bsp','boards','VESNA','tools','flash.sh') + " $SOURCE",
-            	suffix      = '.phonyupload',
-            	src_suffix  = '.ihex',
-        	)
     else:
         if env['fet_version']==2:
             # MSP-FET430uif is running v2 Firmware
@@ -545,13 +546,11 @@ def sconscript_scanner(localEnv):
     '''
     # list subdirectories
     subdirs = [name for name in os.listdir('.') if os.path.isdir(os.path.join('.', name)) ]
-    
     # parse dirs and build targets
     for projectDir in subdirs:
         
         src_dir     = os.path.join(os.getcwd(),projectDir)
         variant_dir = os.path.join(env['VARDIR'],'projects',projectDir),
-        
         added      = False
         targetName = projectDir[2:]
         
@@ -571,12 +570,13 @@ def sconscript_scanner(localEnv):
             source = [os.path.join(projectDir,'{0}.c'.format(projectDir))]
             libs   = buildLibs(projectDir)
             
+           #print 'source %s\ntarget %s\nlibs %s\n' %(source,target,libs)
+            
             buildIncludePath(projectDir,localEnv)
             
             # In Linux, you cannot have the same target name as the name of the
             # directory name.
             target=target+"_prog"
-            
             exe = localEnv.Program(
                 target  = target,
                 source  = source,

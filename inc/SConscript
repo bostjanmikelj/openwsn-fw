@@ -1,7 +1,6 @@
 import os
 
 Import('env')
-
 localEnv = env.Clone()
 
 sources_h = [
