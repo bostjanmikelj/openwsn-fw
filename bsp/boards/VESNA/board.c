@@ -17,6 +17,10 @@
 #include "debugpins.h"
 #include "opentimers.h"
 #include "gpio.h"
+#include "board.h"
+
+static __IO uint32_t boardTimingDelayMS = 0;
+//=========================== private functions ==============================
 
 //=========================== main ============================================
 
@@ -76,15 +80,22 @@ void board_init()
   EXTI_InitStructure.EXTI_LineCmd = ENABLE; 
   EXTI_Init(&EXTI_InitStructure);
   
+  RCC_ClocksTypeDef RCC_Clocks_Freq;
+
+  /* Store frequencies of system clocks to RCC_Clocks_Freq structure */
+  RCC_GetClocksFreq(&RCC_Clocks_Freq);
+
   // initialize board
+  SysTick_Config(RCC_Clocks_Freq.HCLK_Frequency/SYS_TICK_DIV);
+  leds_init();
   uart_init();
   spi_init();
   bsp_timer_init();
-  radio_init();
+  //radio_init();
   radiotimer_init();
   debugpins_init();
   //enable nvic for the radio
-  NVIC_radio();
+  //NVIC_radio();
 }
 
 void board_sleep()
@@ -107,5 +118,18 @@ void board_sleep()
 
 void board_reset()
 {
+	__disable_irq();
+	NVIC_SystemReset();
 }
 
+void board_timeDelayMS(uint32_t msec){
+	boardTimingDelayMS = msec;
+	while (boardTimingDelayMS != 0);
+}
+
+void board_timeDelayDecrement (void){
+	if (boardTimingDelayMS != 0){
+		boardTimingDelayMS--;
+	}
+
+}

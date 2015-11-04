@@ -15,6 +15,9 @@
 #include "board_info.h"
 #include "toolchain_defs.h"
 
+/* Set SysTick interrupt period = 1 second / SYS_TICK_DIV */
+#define SYS_TICK_DIV	1000    /* SysTick interrupt set to millisecond */
+
 //=========================== define ==========================================
 
 typedef enum {
@@ -31,6 +34,8 @@ typedef enum {
 void board_init(void);
 void board_sleep(void);
 void board_reset(void);
+void board_timeDelayMS(uint32_t msec);
+void board_timeDelayDecrement (void);
 
 /**
 \}
