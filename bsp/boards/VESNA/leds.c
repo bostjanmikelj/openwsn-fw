@@ -8,12 +8,13 @@
 #include "leds.h"
 
 //=========================== defines =========================================
-#define LED_RED_PIN             (1<<2)
-#define LED_GREEN_PIN           (1<<5)
-#define LED_ORANGE_PIN          (1<<10)
-
+#define LED_ERROR_PIN          (1<<7)	//RED
+#define LED_SYNC_PIN           (1<<8)	//GREEN
+#define LED_RADIO_PIN          (1<<9)	//YELLOW
+#define GPIO_LED_MAIN			GPIOB
+#define PIN_LED_MAIN			GPIO_Pin_2
 //=========================== variables =======================================
-
+static int32_t pwmCount, pwmCountReload;
 //=========================== prototypes ======================================
 
 void Delay(void);
@@ -23,46 +24,57 @@ void Delay(void);
 void leds_init()
 {
   GPIO_InitTypeDef GPIO_InitStructure;
-
+  /* Init main LED indicator*/
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOB , ENABLE);
+  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_5;
+  GPIO_InitStructure.GPIO_Pin = PIN_LED_MAIN;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIO_LED_MAIN, &GPIO_InitStructure);
+
+  /* LED PWM default values 0.1Hz, 50% */
+  pwmCount = 0;
+  pwmCountReload = 99;
+  GPIO_ResetBits(GPIO_LED_MAIN, PIN_LED_MAIN);
+  /* Init pins for LEDs*/
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_7;
+  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+  GPIO_Init(GPIOA, &GPIO_InitStructure);
+  GPIO_SetBits(GPIOA,GPIO_Pin_7);
+
+  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_8|GPIO_Pin_9;
   GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
+  GPIO_SetBits(GPIOB,GPIO_Pin_8|GPIO_Pin_9);
 
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
-
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_10;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);
-
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
-
-  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
-  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOD, &GPIO_InitStructure);
+//  RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOD , ENABLE);
+//
+//  GPIO_InitStructure.GPIO_Pin = GPIO_Pin_2;
+//  GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
+//  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
+//  GPIO_Init(GPIOD, &GPIO_InitStructure);
 }
 
 // red
 void leds_error_on()
 {
-  GPIOD->ODR &= ~LED_RED_PIN;
+	GPIOA->ODR &= ~LED_ERROR_PIN;
 }
 void leds_error_off()
 {
-  GPIOD->ODR |= LED_RED_PIN;
+	GPIOA->ODR |= LED_ERROR_PIN;
 }
 void leds_error_toggle()
 {
-  GPIOD->ODR ^= LED_RED_PIN;
+	GPIOA->ODR ^= LED_ERROR_PIN;
 }
 uint8_t leds_error_isOn()
 {
   u8 bitstatus = 0x00;
-  if ((GPIOD->ODR & LED_RED_PIN) != (u32)0)
+  if ((GPIOA->ODR & LED_ERROR_PIN) != (u32)0)
   {
     bitstatus = 0x00;
   }
@@ -72,25 +84,33 @@ uint8_t leds_error_isOn()
   }
   return bitstatus;
 }
-void leds_error_blink() {}
+void leds_error_blink() {
+	/*turn OFF error LED*/
+	leds_error_off();
+	leds_error_toggle();
+	/*delay 10ms */
+	board_timeDelayMS(100);
+	leds_error_toggle();
+	board_timeDelayMS(100);
+}
 
 // green
 void leds_sync_on()
 {
-  GPIOB->ODR &= ~LED_GREEN_PIN;
+	GPIOB->ODR &= ~LED_SYNC_PIN;
 }
 void leds_sync_off()
 {
-  GPIOB->ODR |= LED_GREEN_PIN;
+	GPIOB->ODR |= LED_SYNC_PIN;
 }
 void leds_sync_toggle()
 {
-  GPIOB->ODR ^= LED_GREEN_PIN;
+	GPIOB->ODR ^= LED_SYNC_PIN;
 }
 uint8_t leds_sync_isOn()
 {
   u8 bitstatus = 0x00;
-  if ((GPIOB->ODR & LED_GREEN_PIN) != (u32)0)
+  if ((GPIOB->ODR & LED_SYNC_PIN) != (u32)0)
   {
     bitstatus = 0x00;
   }
@@ -101,23 +121,23 @@ uint8_t leds_sync_isOn()
   return bitstatus;
 }
 
-// orange
+// yellow
 void leds_radio_on()
 {
-  GPIOC->ODR &= ~LED_ORANGE_PIN;
+	GPIOB->ODR &= ~LED_RADIO_PIN;
 }
 void leds_radio_off()
 {
-  GPIOC->ODR |= LED_ORANGE_PIN;
+	GPIOB->ODR |= LED_RADIO_PIN;
 }
 void leds_radio_toggle()
 {
-  GPIOC->ODR ^= LED_ORANGE_PIN;
+	GPIOB->ODR ^= LED_RADIO_PIN;
 }
 uint8_t leds_radio_isOn()
 {
   u8 bitstatus = 0x00;
-  if ((GPIOC->ODR & LED_ORANGE_PIN) != (u32)0)
+  if ((GPIOB->ODR & LED_RADIO_PIN) != (u32)0)
   {
     bitstatus = 0x00;
   }
@@ -131,7 +151,9 @@ uint8_t leds_radio_isOn()
 void leds_debug_on() {}
 void leds_debug_off() {}
 void leds_debug_toggle() {}
-uint8_t leds_debug_isOn() {}
+uint8_t leds_debug_isOn() {
+	return 0;
+}
 
 void leds_all_on()
 {
@@ -163,6 +185,19 @@ void leds_circular_shift()
 }
 
 void leds_increment() {}
+
+void leds_indToggle(void){
+	if(pwmCount < 49){
+		GPIO_SetBits(GPIO_LED_MAIN, PIN_LED_MAIN);
+	}
+	else{
+		GPIO_ResetBits(GPIO_LED_MAIN, PIN_LED_MAIN);
+	}
+	pwmCount++;
+	if (pwmCount == pwmCountReload){
+		pwmCount = 0;
+	}
+}
 
 //=========================== private =========================================
 

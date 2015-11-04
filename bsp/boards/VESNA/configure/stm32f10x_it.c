@@ -17,6 +17,7 @@
 
 /* Includes ------------------------------------------------------------------*/
 #include "stm32f10x_it.h"
+#include "board.h"
 #include "leds.h"
 #include "bsp_timer.h"
 #include "radiotimer.h"
@@ -148,6 +149,7 @@ void PendSV_Handler(void)
 void SysTick_Handler(void)
 {
 	leds_indToggle();
+	board_timeDelayDecrement();
 }
 
 /*******************************************************************************
