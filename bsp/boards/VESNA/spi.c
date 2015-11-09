@@ -100,13 +100,13 @@ void spi_init() {
   SPI_InitStructure.SPI_CRCPolynomial     = 7;//CRC Polynomial = 7
   SPI_Init(SPI2, &SPI_InitStructure);
 
-  //enable SPI1
+  //enable SPI2
   SPI_Cmd(SPI2, ENABLE);
   
 #ifdef SPI_IN_INTERRUPT_MODE
   //Configure NVIC: Preemption Priority = 1 and Sub Priority = 1
   NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel	                  = SPI2_IRQChannel;
+  NVIC_InitStructure.NVIC_IRQChannel	                  = SPI2_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority	= 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority	        = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd	                = ENABLE;
@@ -128,9 +128,12 @@ void spi_txrx(uint8_t*     bufTx,
               spi_first_t  isFirst,
               spi_last_t   isLast) {
 
+
 #ifdef SPI_IN_INTERRUPT_MODE
-   // disable interrupts
-   NVIC_RESETPRIMASK();
+	//Enable Rx interrupts
+	SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, ENABLE);
+	// disable interrupts
+	__disable_irq();
 #endif
    
    // register spi frame to send
@@ -149,17 +152,17 @@ void spi_txrx(uint8_t*     bufTx,
    
    // lower CS signal to have slave listening
    if (spi_vars.isFirst==SPI_FIRST) {
-   GPIO_ResetBits(GPIOA, GPIO_Pin_4);
+	   CSn_CLR();
    }
    
 #ifdef SPI_IN_INTERRUPT_MODE
    // implementation 1. use a callback function when transaction finishes
-   
+
    // write first byte to TX buffer
    SPI_I2S_SendData(SPI2,*spi_vars.pNextTxByte);
-   
    // re-enable interrupts
-   NVIC_SETPRIMASK();
+   __enable_irq();
+
 #else
    // implementation 2. busy wait for each byte to be sent
    // send all bytes
@@ -176,15 +179,15 @@ void spi_txrx(uint8_t*     bufTx,
       switch (spi_vars.returnType) {
          case SPI_FIRSTBYTE:
             if (spi_vars.numTxedBytes==0) {
-               *spi_vars.pNextRxByte   = SPI_I2S_ReceiveData(SPI1);
+               *spi_vars.pNextRxByte   = SPI_I2S_ReceiveData(SPI2);
             }
             break;
          case SPI_BUFFER:
-            *spi_vars.pNextRxByte      = SPI_I2S_ReceiveData(SPI1);
+            *spi_vars.pNextRxByte      = SPI_I2S_ReceiveData(SPI2);
             spi_vars.pNextRxByte++;
             break;
          case SPI_LASTBYTE:
-            *spi_vars.pNextRxByte      = SPI_I2S_ReceiveData(SPI1);
+            *spi_vars.pNextRxByte      = SPI_I2S_ReceiveData(SPI2);
             break;
       }
       // one byte less to go
@@ -195,7 +198,8 @@ void spi_txrx(uint8_t*     bufTx,
    
    // put CS signal high to signal end of transmission to slave
    if (spi_vars.isLast==SPI_LAST) {
-   GPIO_SetBits(GPIOA, GPIO_Pin_4);
+	  // CSn_SET();
+   GPIO_SetBits(GPIOB, GPIO_Pin_12);
    }
    
    // SPI is not busy anymore
@@ -232,11 +236,11 @@ kick_scheduler_t spi_isr() {
    
    if (spi_vars.txBytesLeft>0) {
       // write next byte to TX buffer
-   SPI_SendData(SPI2,*spi_vars.pNextTxByte);
+	   SPI_I2S_SendData(SPI2,*spi_vars.pNextTxByte);
    } else {
       // put CS signal high to signal end of transmission to slave
       if (spi_vars.isLast==SPI_LAST) {
-   GPIO_SetBits(GPIOB, GPIO_Pin_12);
+    	  CSn_SET();
       }
       // SPI is not busy anymore
       spi_vars.busy          =  0;
