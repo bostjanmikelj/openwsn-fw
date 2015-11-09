@@ -19,8 +19,8 @@ run regardless of your radio, but might not return anything useful.
 //=========================== variables =======================================
 
 typedef struct {
-   uint8_t    txBuf[3];
-   uint8_t    rxBuf[3];
+   uint8_t    txBuf[2];
+   uint8_t    rxBuf[2];
 } app_vars_t;
 
 app_vars_t app_vars;
@@ -45,7 +45,6 @@ int mote_main(void) {
                                             // [b6]    RAM/Register : 0    (register)
                                             // [b5-0]  address:       0x1E (Manufacturer ID, Lower 16 Bit)
    app_vars.txBuf[1]     =  0x00;           // send a SNOP strobe just to get the reg value
-   app_vars.txBuf[2]     =  0x00;           // send a SNOP strobe just to get the reg value
    
    // retrieve radio manufacturer ID over SPI
    while(1) {
