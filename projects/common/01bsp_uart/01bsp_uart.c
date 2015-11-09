@@ -22,6 +22,7 @@ TeraTerm):
 #include "uart.h"
 #include "bsp_timer.h"
 #include "leds.h"
+#include "debugpins.h"
 
 //=========================== defines =========================================
 
@@ -57,20 +58,17 @@ int mote_main(void) {
    // initialize the board
    board_init();
    
-   // setup UART
-   uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
-   uart_enableInterrupts();
-   
    // setup BSP timer
    bsp_timer_set_callback(cb_compare);
    bsp_timer_scheduleIn(BSP_TIMER_PERIOD);
-   
+
+   // setup UART
+   uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
+   uart_enableInterrupts();
    while(1) {
-      
       // wait for timer to elapse
       while (app_vars.uartSendNow==0);
       app_vars.uartSendNow = 0;
-      
       // send string over UART
       app_vars.uartDone              = 0;
       app_vars.uart_lastTxByteIndex  = 0;
@@ -82,7 +80,7 @@ int mote_main(void) {
 //=========================== callbacks =======================================
 
 void cb_compare(void) {
-   
+   debugpins_frame_toggle();
    // have main "task" send over UART
    app_vars.uartSendNow = 1;
    
@@ -95,7 +93,9 @@ void cb_uartTxDone(void) {
    if (app_vars.uart_lastTxByteIndex<sizeof(stringToSend)) {
       uart_writeByte(stringToSend[app_vars.uart_lastTxByteIndex]);
    } else {
+	  USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
       app_vars.uartDone = 1;
+      uart_vars.isFirst = TRUE;
    }
 }
 

@@ -27,6 +27,13 @@ typedef enum {
 typedef void (*uart_tx_cbt)(void);
 typedef void (*uart_rx_cbt)(void);
 
+typedef struct {
+   uart_tx_cbt txCb;
+   uart_rx_cbt rxCb;
+   bool isFirst;
+} uart_vars_t;
+
+extern volatile uart_vars_t uart_vars;
 //=========================== variables =======================================
 
 //=========================== prototypes ======================================
