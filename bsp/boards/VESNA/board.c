@@ -35,7 +35,7 @@ int main(void)
 
 void board_init()
 {
-  RCC_Configuration();//Configure rcc
+  RCC_Configuration(SNC_CLOCK_32MHZ);//Configure rcc
   NVIC_Configuration();//configure NVIC and Vector Table
   
   //configure ALL GPIO to AIN to get lowest power
