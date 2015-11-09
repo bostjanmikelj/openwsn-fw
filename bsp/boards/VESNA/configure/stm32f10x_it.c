@@ -624,19 +624,22 @@ void SPI2_IRQHandler(void)
 *******************************************************************************/
 void USART1_IRQHandler(void)
 {  
-  debugpins_isr_set();
-  if(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
-  {
-    USART_ClearFlag(USART1, USART_FLAG_RXNE);
-    
-    uart_rx_isr();
-  }
+	debugpins_isr_set();
+	if(USART_GetFlagStatus(USART1, USART_FLAG_RXNE) != RESET)
+	{
+		USART_ClearFlag(USART1, USART_FLAG_RXNE);
 
-  if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) != RESET)
-  { 
-    uart_tx_isr(); 
-  }
-  debugpins_isr_clr();
+		uart_rx_isr();
+	}
+
+	if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) != RESET)
+	{
+		if (USART_GetFlagStatus(USART1, USART_FLAG_TC) != RESET){
+			USART_ClearFlag(USART1, USART_FLAG_TXE|USART_FLAG_TC);
+			uart_tx_isr();
+		}
+	}
+	debugpins_isr_clr();
 }
 
 /*******************************************************************************
