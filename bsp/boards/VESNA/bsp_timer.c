@@ -14,7 +14,7 @@ On openmoteSTM32, we use TIM2 for the bsp_timer module.
 #include "nvic.h"
 
 //=========================== defines =========================================
-
+#define TIMER_FREQ		32000	//Timer frequency should be 32 kHz
 //=========================== variables =======================================
 
 typedef struct {
@@ -36,16 +36,21 @@ any compare registers, so no interrupt will fire.
 */
 void bsp_timer_init() 
 {
+	RCC_ClocksTypeDef RCC_Clocks_Freq;
+	uint16_t prescaler;
+	 RCC_GetClocksFreq(&RCC_Clocks_Freq);
+	// calculate timer settings so it ticks with 32kHz*/
+	 prescaler = (RCC_Clocks_Freq.PCLK1_Frequency/TIMER_FREQ) - 1;
     // clear local variables
     memset(&bsp_timer_vars,0,sizeof(bsp_timer_vars_t));
     
     //Configure TIM2, Clock
     RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM2 , ENABLE);
 
-    //Configure TIM2: Period = 0xffff, prescaler = 2303(72M/(2303+1) = 32.768KHz), CounterMode  = upCounting mode
+    //Configure TIM2: Period = 0xffff, prescaler = 999 (32M/(999+1) = 32kHz), CounterMode  = upCounting mode
     TIM_TimeBaseInitTypeDef TIM_TimeBaseStructure ;
     TIM_TimeBaseStructure.TIM_Period        = 0xFFFF;
-    TIM_TimeBaseStructure.TIM_Prescaler     = 2303;;
+    TIM_TimeBaseStructure.TIM_Prescaler     = prescaler;;
     TIM_TimeBaseStructure.TIM_ClockDivision = 0;
     TIM_TimeBaseStructure.TIM_CounterMode   = TIM_CounterMode_Up;
     TIM_TimeBaseInit(TIM2, &TIM_TimeBaseStructure);
@@ -60,16 +65,6 @@ void bsp_timer_init()
           
     //enable TIM2
     TIM_Cmd(TIM2, ENABLE); 
-    //disable interrupt
-    //bsp_timer_cancel_schedule();
-    
-//    //Configure NVIC: Preemption Priority = 2 and Sub Priority = 1
-//    NVIC_InitTypeDef NVIC_InitStructure;
-//    NVIC_InitStructure.NVIC_IRQChannel = TIM2_IRQChannel;
-//    NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
-//    NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
-//    NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
-//    NVIC_Init(&NVIC_InitStructure);
 }
 
 /**
