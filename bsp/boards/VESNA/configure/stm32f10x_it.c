@@ -634,10 +634,8 @@ void USART1_IRQHandler(void)
 
 	if(USART_GetFlagStatus(USART1, USART_FLAG_TXE) != RESET)
 	{
-		if (USART_GetFlagStatus(USART1, USART_FLAG_TC) != RESET){
-			USART_ClearFlag(USART1, USART_FLAG_TXE|USART_FLAG_TC);
-			uart_tx_isr();
-		}
+		USART_ClearFlag(USART1, USART_FLAG_TXE|USART_FLAG_TC);
+		uart_tx_isr();
 	}
 	debugpins_isr_clr();
 }
