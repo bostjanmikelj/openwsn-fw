@@ -69,7 +69,7 @@ void board_init()
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN_FLOATING;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
   
-  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource4);//Connect EXTI Line9 to PC.9
+  GPIO_EXTILineConfig(GPIO_PortSourceGPIOC, GPIO_PinSource9);//Connect EXTI Line9 to PC.9
   EXTI_ClearITPendingBit(EXTI_Line9);
 
   //Configures EXTI line 9 to generate an interrupt on rising edge
@@ -91,11 +91,11 @@ void board_init()
   uart_init();
   spi_init();
   bsp_timer_init();
-  //radio_init();
+  radio_init();
   radiotimer_init();
   debugpins_init();
   //enable nvic for the radio
-  //NVIC_radio();
+  NVIC_radio();
 }
 
 void board_sleep()

@@ -39,13 +39,13 @@ to return the board's description.
 //===== pinout
 
 // [PC.10] radio SLP_TR_CNTL
-#define PORT_PIN_RADIO_SLP_TR_CNTL_HIGH()     GPIOA->ODR |= (1<<10);
-#define PORT_PIN_RADIO_SLP_TR_CNTL_LOW()      GPIOA->ODR &= ~(1<<10);
+#define PORT_PIN_RADIO_SLP_TR_CNTL_HIGH()     GPIOC->ODR |= 0x0400;
+#define PORT_PIN_RADIO_SLP_TR_CNTL_LOW()      GPIOC->ODR &= ~0x0400;
 // radio reset line
 // radio /RST [PC.11]
-#define PORT_PIN_RADIO_RESET_HIGH()       //GPIOC->ODR |= 0X0800;// nothing
-#define PORT_PIN_RADIO_RESET_LOW()        //GPIOC->ODR &= ~0X0800;// nothing
-//#define PORT_PIN_RADIO_RESET_LOW()            GPIOC->ODR &= ~(1<<1);
+#define PORT_PIN_RADIO_RESET_HIGH()       	GPIOC->ODR |= 0X0800;// nothing
+#define PORT_PIN_RADIO_RESET_LOW()        	GPIOC->ODR &= ~0X0800;// nothing
+
 
 //===== IEEE802154E timing
 // time-slot related
