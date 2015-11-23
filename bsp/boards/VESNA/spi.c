@@ -95,7 +95,7 @@ void spi_init() {
   SPI_InitStructure.SPI_CPOL              = SPI_CPOL_Low;  //the SCK pin has a low-level idle state 
   SPI_InitStructure.SPI_CPHA              = SPI_CPHA_1Edge; //the first rising edge on the SCK pin is the MSBit capture strobe,
   SPI_InitStructure.SPI_NSS               = SPI_NSS_Soft;//Software NSS mode
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_16;//BaudRate Prescaler = 8 
+  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_8;//BaudRate Prescaler = 8
   SPI_InitStructure.SPI_FirstBit          = SPI_FirstBit_MSB;//data order with MSB-first
   SPI_InitStructure.SPI_CRCPolynomial     = 7;//CRC Polynomial = 7
   SPI_Init(SPI2, &SPI_InitStructure);
@@ -104,13 +104,7 @@ void spi_init() {
   SPI_Cmd(SPI2, ENABLE);
   
 #ifdef SPI_IN_INTERRUPT_MODE
-  //Configure NVIC: Preemption Priority = 1 and Sub Priority = 1
-  NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel	                  = SPI2_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority	= 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority	        = 1;
-  NVIC_InitStructure.NVIC_IRQChannelCmd	                = ENABLE;
-  NVIC_Init(&NVIC_InitStructure);
+  NVIC_spi();
 #endif
 }
 
@@ -130,10 +124,10 @@ void spi_txrx(uint8_t*     bufTx,
 
 
 #ifdef SPI_IN_INTERRUPT_MODE
-	//Enable Rx interrupts
-	SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, ENABLE);
 	// disable interrupts
 	__disable_irq();
+	//Enable Rx interrupts
+	SPI_I2S_ITConfig(SPI2, SPI_I2S_IT_RXNE, ENABLE);
 #endif
    
    // register spi frame to send
