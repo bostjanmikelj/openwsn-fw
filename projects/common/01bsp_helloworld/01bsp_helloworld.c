@@ -20,6 +20,8 @@ int mote_main(void){
 			uart_writeByte(debugStr[i]);
 		}
 		i = 0;
+		GPIO_ResetBits(GPIOB,GPIO_Pin_12);
 		board_timeDelayMS(5000);
+		GPIO_SetBits(GPIOB,GPIO_Pin_12);
 	}
 }
