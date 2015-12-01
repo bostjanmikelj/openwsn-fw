@@ -61,6 +61,8 @@ void    spi_txrx(uint8_t*     bufTx,
                  spi_first_t  isFirst,
                  spi_last_t   isLast);
 
+uint8_t spi_isBusy(void);
+
 // interrupt handlers
 kick_scheduler_t spi_isr(void);
 
