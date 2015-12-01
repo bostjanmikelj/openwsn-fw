@@ -27,9 +27,9 @@ Each time a radiotimer compare event happens:
 
 //=========================== defines =========================================
 
-#define RADIOTIMER_OVERFLOW_PERIOD      20000
-#define RADIOTIMER_COMPARE_PERIOD        2000
-#define RADIOTIMER_NUM_COMPARES             4
+#define RADIOTIMER_OVERFLOW_PERIOD      16000	//20000
+#define RADIOTIMER_COMPARE_PERIOD        1600	//2000
+#define RADIOTIMER_NUM_COMPARES             8
 
 //=========================== variables =======================================
 
