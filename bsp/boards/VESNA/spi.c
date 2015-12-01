@@ -40,12 +40,8 @@ typedef struct {
 volatile spi_vars_t spi_vars;
 
 //=========================== prototypes ======================================
-inline static void RESET_CLR(void) { GPIOC->BRR = 1<<11; }
-inline static void RESET_SET(void) { GPIOC->BSRR = 1<<11; }
 inline static void CSn_SET(void) { GPIOB->BSRR = 1<<12; }
 inline static void CSn_CLR(void) { GPIOB->BRR = 1<<12; }
-inline static void SLEEP_CLR(void) { GPIOC->BRR = 1<<10; }
-
 //=========================== public ==========================================
 
 void spi_init() {
@@ -74,20 +70,9 @@ void spi_init() {
   GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_12;
   GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
   GPIO_Init(GPIOB, &GPIO_InitStructure);
-  // Configure RST and SLP_T pin of RF
-  GPIO_InitStructure.GPIO_Pin     = GPIO_Pin_10 | GPIO_Pin_11;
-  GPIO_InitStructure.GPIO_Mode    = GPIO_Mode_Out_PP;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);
 
   // force reset
-  RESET_CLR();
   CSn_SET();
-  SLEEP_CLR();
-
-  for (uint16_t j=0;j<0xFFFF;j++); //small wait
-
-  RESET_SET();
-  
   //Configure SPI2
   SPI_InitStructure.SPI_Direction         = SPI_Direction_2Lines_FullDuplex; //Full-duplex synchronous transfers on two lines
   SPI_InitStructure.SPI_Mode              = SPI_Mode_Master;//Master Mode
@@ -199,6 +184,10 @@ void spi_txrx(uint8_t*     bufTx,
    // SPI is not busy anymore
    spi_vars.busy             =  0;
 #endif
+}
+
+uint8_t spi_isBusy(void){
+	return spi_vars.busy;
 }
 
 //=========================== private =========================================
