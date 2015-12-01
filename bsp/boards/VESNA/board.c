@@ -49,21 +49,14 @@ void board_init()
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC , ENABLE);
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
   
-  //Configure PC.10 as SLP_TR pin of RF
-  GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_10;
+  //Configure PC.10 as SLP_TR pin of RF and PC.11 as RST pin of RF
+  GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_10|GPIO_Pin_11;
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
   GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOC, &GPIO_InitStructure);
-
-  //Configure PC.11 as RST pin of RF
-  GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_11;
-  GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_Out_PP;
-  GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOC, &GPIO_InitStructure);
-  
   //set /RST pin high(never reset)
   GPIO_SetBits(GPIOC, GPIO_Pin_11);
-  
+
   // Configure PC.09 as input floating (EXTI Line9)
   GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_9;
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IN_FLOATING;
@@ -87,6 +80,7 @@ void board_init()
 
   // initialize board
   SysTick_Config(RCC_Clocks_Freq.HCLK_Frequency/SYS_TICK_DIV);
+//  board_timeDelayMS(1000);
   leds_init();
   uart_init();
   spi_init();

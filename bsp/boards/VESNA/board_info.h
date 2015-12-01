@@ -46,6 +46,8 @@ to return the board's description.
 #define PORT_PIN_RADIO_RESET_HIGH()       	GPIOC->ODR |= 0X0800;// nothing
 #define PORT_PIN_RADIO_RESET_LOW()        	GPIOC->ODR &= ~0X0800;// nothing
 
+#define PORT_PIN_RADIO_SEL_HIGH()       	GPIOB->ODR |= 0X1000;// nothing
+#define PORT_PIN_RADIO_SEL_LOW()        	GPIOB->ODR &= ~0X1000;// nothing
 
 //===== IEEE802154E timing
 // time-slot related
