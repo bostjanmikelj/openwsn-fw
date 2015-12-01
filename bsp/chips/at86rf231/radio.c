@@ -41,28 +41,24 @@ uint8_t radio_spiReadRadioInfo(void);
 //===== admin
 
 void radio_init() {
-
-   // clear variables
-   memset(&radio_vars,0,sizeof(radio_vars_t));
-   
-   // change state
-   radio_vars.state          = RADIOSTATE_STOPPED;
-  
-   // configure the radio
-   radio_spiWriteReg(RG_TRX_STATE, CMD_FORCE_TRX_OFF);    // turn radio off
-  
-   radio_spiWriteReg(RG_IRQ_MASK,
-                     (AT_IRQ_RX_START| AT_IRQ_TRX_END));  // tell radio to fire interrupt on TRX_END and RX_START
-   radio_spiReadReg(RG_IRQ_STATUS);                       // deassert the interrupt pin in case is high
-   radio_spiWriteReg(RG_ANT_DIV, RADIO_CHIP_ANTENNA);     // use chip antenna
-#define RG_TRX_CTRL_1 0x04
-   radio_spiWriteReg(RG_TRX_CTRL_1, 0x20);                // have the radio calculate CRC
-   //busy wait until radio status is TRX_OFF
-  
-   while((radio_spiReadReg(RG_TRX_STATUS) & 0x1F) != TRX_OFF);
-   
-   // change state
-   radio_vars.state          = RADIOSTATE_RFOFF;
+	uint8_t regVal;
+	// clear variables
+	memset(&radio_vars,0,sizeof(radio_vars_t));
+	// change state
+	radio_vars.state          = RADIOSTATE_STOPPED;
+	// configure the radio
+	radio_spiWriteReg(RG_TRX_STATE, CMD_FORCE_TRX_OFF);    // turn radio off
+	//busy wait until radio status is TRX_OFF
+	while ((regVal&0x1F)!=TRX_OFF){
+			regVal = radio_spiReadReg(RG_TRX_STATUS);
+		}
+	regVal = radio_spiReadReg(RG_IRQ_STATUS);
+	radio_spiWriteReg(RG_IRQ_MASK,
+			(AT_IRQ_RX_START| AT_IRQ_TRX_END));  // tell radio to fire interrupt on TRX_END and RX_START
+                       // deassert the interrupt pin in case is high
+	radio_spiWriteReg(RG_ANT_DIV, RADIO_CHIP_ANTENNA);     // use chip antenna !!check this settings for SNR-TRx board DIG1->GND and DIG2->PB7
+	// change state
+	radio_vars.state          = RADIOSTATE_RFOFF;
 }
 
 void radio_setOverflowCb(radiotimer_compare_cbt cb) {
@@ -84,7 +80,12 @@ void radio_setEndFrameCb(radiotimer_capture_cbt cb) {
 //===== reset
 
 void radio_reset() {
-   PORT_PIN_RADIO_RESET_LOW();
+	PORT_PIN_RADIO_RESET_LOW();
+	PORT_PIN_RADIO_SLP_TR_CNTL_LOW();
+	PORT_PIN_RADIO_SEL_HIGH();
+	for (uint16_t i=0;i<0xFFFF;i++);
+	PORT_PIN_RADIO_RESET_HIGH();
+	for (uint16_t i=0;i<0xFFFF;i++);
 }
 
 //===== timer
@@ -118,8 +119,9 @@ void radio_setFrequency(uint8_t frequency) {
    radio_vars.state = RADIOSTATE_FREQUENCY_SET;
 }
 
+/* Do nothing*/
 void radio_rfOn() {
-   PORT_PIN_RADIO_RESET_LOW();
+   //PORT_PIN_RADIO_RESET_LOW();
 }
 
 void radio_rfOff() {
@@ -267,10 +269,10 @@ uint8_t radio_spiReadRadioInfo(){
 }
 
 void radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting) {
-   uint8_t spi_tx_buffer[2];
-   uint8_t spi_rx_buffer[2];
+   uint8_t spi_tx_buffer[2] = {0};
+   uint8_t spi_rx_buffer[2] = {0};
    
-   spi_tx_buffer[0] = (0xC0 | reg_addr);        // turn addess in a 'reg write' address
+   spi_tx_buffer[0] = (0xC0 | reg_addr);        // turn address in a 'reg write' address
    spi_tx_buffer[1] = reg_setting;
    
    spi_txrx(spi_tx_buffer,
@@ -280,11 +282,12 @@ void radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting) {
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_LAST);
+	while (spi_isBusy()==1){}
 }
 
 uint8_t radio_spiReadReg(uint8_t reg_addr) {
-   uint8_t spi_tx_buffer[2];
-   uint8_t spi_rx_buffer[2];
+   uint8_t spi_tx_buffer[2] = {0};
+   uint8_t spi_rx_buffer[2] = {0};
    
    spi_tx_buffer[0] = (0x80 | reg_addr);        // turn addess in a 'reg read' address
    spi_tx_buffer[1] = 0x00;                     // send a no_operation command just to get the reg value
@@ -297,8 +300,8 @@ uint8_t radio_spiReadReg(uint8_t reg_addr) {
             SPI_FIRST,
             SPI_LAST);
    
-
-  return spi_rx_buffer[1];
+   while (spi_isBusy()==1){}
+   return spi_rx_buffer[1];
 }
 
 /** for testing purposes, remove if not needed anymore**/

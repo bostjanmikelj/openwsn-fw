@@ -37,6 +37,9 @@ enum radio_irqstatus_enum {
   /** Access parameters for sub-register CCA_DONE in register @ref RG_TRX_STATUS
    * @ingroup apiHalPHY230Sreg
    */
+#define RG_TRX_CTRL_1 0x04
+#define RG_TRX_CTRL_2 0x0C
+#define RG_CC_CTRL_1  0x14
 # define SR_CCA_DONE                  0x01, 0x80, 7
   /** Access parameters for sub-register CCA_STATUS in register @ref RG_TRX_STATUS
    * @ingroup apiHalPHY230Sreg
