@@ -248,26 +248,6 @@ void RCC_Configuration(SNC_Clock freq)
 //when wakeup by alarm, configure rcc
 void RCC_Wakeup(void)
 {
-	ErrorStatus HSEStartUpStatus;
-
-	//enable HSE
-	RCC_HSEConfig(RCC_HSE_ON);
-	//Wait till HSE is ready
-	HSEStartUpStatus = RCC_WaitForHSEStartUp();
-	if(HSEStartUpStatus == SUCCESS)
-	{
-		//enable PLL
-		RCC_PLLCmd(ENABLE);
-		//Wait till PLL is ready
-		while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY) == RESET)
-		{}
-
-		// Select PLL as system clock source
-		RCC_SYSCLKConfig(RCC_SYSCLKSource_PLLCLK);
-
-		//Wait till PLL is used as system clock source
-		while(RCC_GetSYSCLKSource() != 0x08)
-		{}
-	}
+	//do nothing using HSI
 }
 
