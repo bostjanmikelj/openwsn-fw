@@ -11,6 +11,7 @@
 #define LED_ERROR_PIN          (1<<7)	//RED
 #define LED_SYNC_PIN           (1<<8)	//GREEN
 #define LED_RADIO_PIN          (1<<9)	//YELLOW
+#define LED_MAIN_PIN		   (1<<2)	//VESNA MAIN LED
 #define GPIO_LED_MAIN			GPIOB
 #define PIN_LED_MAIN			GPIO_Pin_2
 //=========================== variables =======================================
@@ -186,12 +187,22 @@ void leds_circular_shift()
 
 void leds_increment() {}
 
+void 	leds_main_on(void){
+	GPIOB->ODR |= LED_MAIN_PIN;
+}
+void 	leds_main_off(void){
+	GPIOB->ODR &= ~LED_MAIN_PIN;
+}
+void 	leds_main_toggle(void){
+	GPIOB->ODR ^= LED_MAIN_PIN;
+}
+
 void leds_indToggle(void){
 	if(pwmCount < 49){
-		GPIO_SetBits(GPIO_LED_MAIN, PIN_LED_MAIN);
+		leds_main_on();
 	}
 	else{
-		GPIO_ResetBits(GPIO_LED_MAIN, PIN_LED_MAIN);
+		leds_main_off();
 	}
 	pwmCount++;
 	if (pwmCount == pwmCountReload){

@@ -61,6 +61,9 @@ void    leds_all_toggle(void);
 void    leds_circular_shift(void);
 void    leds_increment(void);
 
+void 	leds_main_on(void);
+void 	leds_main_off(void);
+void 	leds_main_toggle(void);
 void 	leds_indToggle(void);
 
 /**
