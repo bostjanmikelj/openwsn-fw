@@ -25,9 +25,10 @@ end of frame event), it will turn on its error LED.
 //=========================== defines =========================================
 
 #define LENGTH_PACKET   125+LENGTH_CRC ///< maximum length is 127 bytes
-#define CHANNEL         11             ///< 11=2.405GHz
+#define CHANNEL         0             ///< 11=2.405GHz
 #define TIMER_PERIOD    0xffff         ///< 0xffff = 2s@32kHz
 #define ID              0x99           ///< byte sent in the packets
+#define RADIO_TIMER_PERIOD	(32768>>1)
 
 //=========================== variables =======================================
 
@@ -101,7 +102,7 @@ int mote_main(void) {
    // start bsp timer
    bsp_timer_set_callback(cb_timer);
    bsp_timer_scheduleIn(TIMER_PERIOD);
-   
+   radiotimer_start(RADIO_TIMER_PERIOD);
    // prepare radio
    radio_rfOn();
    radio_setFrequency(CHANNEL);

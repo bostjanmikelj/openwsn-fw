@@ -9,7 +9,7 @@ port, all information about the received packet. The frame printed over the
 serial port for each received packet is formatted as follows:
 - [1B] the length of the packet, an unsigned integer
 - [1B] the first byte of the packet, an unsigned integer
-- [1B] the receive signal strength of tehe packet, an signed integer
+- [1B] the receive signal strength of the packet, an signed integer
 - [1B] the link quality indicator, an unsigned integer
 - [1B] whether the receive packet passed CRC (1) or not (0)
 - [3B] closing flags, each of value 0xff
@@ -72,9 +72,9 @@ len=17  num=84  rssi=-81  lqi=108 crc=1
 //=========================== defines =========================================
 
 #define LENGTH_PACKET        125+LENGTH_CRC ///< maximum length is 127 bytes
-#define CHANNEL              11             ///< 11 = 2.405GHz
+#define CHANNEL              0             ///< 11 = 2.405GHz
 #define LENGTH_SERIAL_FRAME  8              ///< length of the serial frame
-
+#define TIMER_PERIOD    (32768>>1)     // (32768>>1) = 500ms @ 32kHz
 //=========================== variables =======================================
 
 typedef struct {
@@ -136,7 +136,8 @@ int mote_main(void) {
    
    // setup UART
    uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
-   
+   // start Radiotimer otherwise radio_isr hangs
+   radiotimer_start(TIMER_PERIOD);
    // prepare radio
    radio_rfOn();
    radio_setFrequency(CHANNEL);
@@ -251,7 +252,9 @@ void cb_uartTxDone(void) {
    if (app_vars.uart_lastTxByte<sizeof(app_vars.uart_txFrame)) {
       uart_writeByte(app_vars.uart_txFrame[app_vars.uart_lastTxByte]);
    } else {
-      app_vars.uart_done=1;
+	   USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+	   app_vars.uart_done = 1;
+	   uart_vars.isFirst = TRUE;
    }
 }
 
