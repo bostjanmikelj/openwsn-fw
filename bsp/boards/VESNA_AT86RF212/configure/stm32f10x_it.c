@@ -277,17 +277,6 @@ void EXTI3_IRQHandler(void)
 *******************************************************************************/
 void EXTI4_IRQHandler(void)	//todo remove this interrupt
 {
-//  if(EXTI_GetITStatus(EXTI_Line4) != RESET){
-//    debugpins_isr_set();
-//
-//    //leds_error_toggle();
-//    EXTI_ClearITPendingBit(EXTI_Line4);
-//
-//    //RCC_Wakeup();
-//    radio_isr();
-//
-//    debugpins_isr_clr();
-//  }
 }
 
 /*******************************************************************************
@@ -590,12 +579,6 @@ void I2C2_ER_IRQHandler(void)
 *******************************************************************************/
 void SPI1_IRQHandler(void)
 {
-//  debugpins_isr_set();
-//  if(SPI_I2S_GetFlagStatus(SPI1,SPI_I2S_FLAG_RXNE) != RESET)
-//  {
-//    spi_isr();
-//  }
-//  debugpins_isr_clr();
 }
 
 /*******************************************************************************
@@ -682,13 +665,13 @@ void EXTI15_10_IRQHandler(void)
 *******************************************************************************/
 void RTCAlarm_IRQHandler(void)
 {
-  debugpins_isr_set();
-  if(EXTI_GetITStatus(EXTI_Line17) != RESET)
-  {
-	EXTI_ClearITPendingBit(EXTI_Line17);
-        radiotimer_isr();
-  }
-  debugpins_isr_clr();
+	debugpins_isr_set();
+	if(EXTI_GetITStatus(EXTI_Line17) != RESET)
+	{
+		EXTI_ClearITPendingBit(EXTI_Line17);
+		radiotimer_isr();
+	}
+	debugpins_isr_clr();
 }
 
 /*******************************************************************************
