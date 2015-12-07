@@ -92,6 +92,12 @@ void uart_clearTxInterrupts()
 
 void uart_writeByte(uint8_t byteToWrite)
 {
+	if ((uart_vars.rxCb==NULL)&&(uart_vars.txCb==NULL)){
+		//polling
+		USART_SendData(USART1, byteToWrite);
+		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+		return;
+	}
 	if(uart_vars.isFirst){
 		USART_SendData(USART1, byteToWrite);
 		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
