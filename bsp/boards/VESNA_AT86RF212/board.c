@@ -81,7 +81,6 @@ void board_init()
 
   // initialize board
   SysTick_Config(RCC_Clocks_Freq.HCLK_Frequency/SYS_TICK_DIV);
-//  board_timeDelayMS(1000);
   leds_init();
   uart_init();
   spi_init();
@@ -90,7 +89,7 @@ void board_init()
   radiotimer_init();
   debugpins_init();
   //enable nvic for the radio
- // NVIC_radio();
+  NVIC_radio();
 }
 
 void board_sleep()
@@ -103,9 +102,16 @@ void board_sleep()
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
   // Desable the SRAM and FLITF clock in Stop mode
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_SRAM | RCC_AHBPeriph_FLITF, DISABLE);
+  //turn off LEDS
+  leds_error_off();
+  leds_radio_off();
+  leds_sync_off();
+  leds_main_off();
+  PORT_PIN_RADIO_SEL_HIGH();
 
-  PWR_EnterSTOPMode(PWR_Regulator_ON,PWR_STOPEntry_WFI);
-  
+  PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+  //turnON radio led
+  leds_radio_on();
   if(sleepTime > 0)
   opentimers_sleepTimeCompesation(sleepTime*2);
 #endif 
