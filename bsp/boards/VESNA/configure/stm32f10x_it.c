@@ -665,13 +665,14 @@ void EXTI15_10_IRQHandler(void)
 *******************************************************************************/
 void RTCAlarm_IRQHandler(void)
 {
-  debugpins_isr_set();
-  if(EXTI_GetITStatus(EXTI_Line17) != RESET)
-  {
-	EXTI_ClearITPendingBit(EXTI_Line17);
-        radiotimer_isr();
-  }
-  debugpins_isr_clr();
+	debugpins_isr_set();
+	if(EXTI_GetITStatus(EXTI_Line17) != RESET)
+	{
+		EXTI_ClearITPendingBit(EXTI_Line17);
+		rtc_timer_isr();
+		radiotimer_isr();
+	}
+	debugpins_isr_clr();
 }
 
 /*******************************************************************************

@@ -669,6 +669,7 @@ void RTCAlarm_IRQHandler(void)
 	if(EXTI_GetITStatus(EXTI_Line17) != RESET)
 	{
 		EXTI_ClearITPendingBit(EXTI_Line17);
+		rtc_timer_isr();
 		radiotimer_isr();
 	}
 	debugpins_isr_clr();
