@@ -122,6 +122,7 @@ uint8_t rtc_timer_isr()
 {
     if (rtc_timer_vars.alarm_cb!=NULL)
     {
+      RCC_Wakeup();
       // call the callback
       rtc_timer_vars.alarm_cb();
       // kick the OS
