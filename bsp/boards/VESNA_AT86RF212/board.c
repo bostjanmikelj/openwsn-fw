@@ -109,7 +109,13 @@ void board_sleep()
   leds_main_off();
   PORT_PIN_RADIO_SEL_HIGH();
 
+  EXTI_ClearFlag(0x000FFFFF);	 //clear all exti line pending bits to before enetering stop mode
+  RTC_ClearFlag(RTC_FLAG_ALR);
+  SysTick->CTRL &= 0xFFFFFFFD;	//Disable SysTick interrupt to prevent waking up board
   PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+
+  /* Reinit RCC after exit from stop mode*/
+  SysTick->CTRL |= 0x00000002;	//Enable SysTick interrupt
   //turnON radio led
   leds_radio_on();
   if(sleepTime > 0)

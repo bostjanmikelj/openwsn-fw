@@ -99,7 +99,7 @@ void board_sleep()
   
   // Enable PWR and BKP clock
   RCC_APB1PeriphClockCmd(RCC_APB1Periph_PWR | RCC_APB1Periph_BKP, ENABLE);
-  // Dssable the SRAM and FLITF clock in Stop mode
+  // Desable the SRAM and FLITF clock in Stop mode
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_SRAM | RCC_AHBPeriph_FLITF, DISABLE);
   //turn off LEDS
   leds_error_off();
@@ -108,10 +108,15 @@ void board_sleep()
   leds_main_off();
   PORT_PIN_RADIO_SEL_HIGH();
 
+  EXTI_ClearFlag(0x000FFFFF);	 //clear all exti line pending bits to before entering stop mode
+  RTC_ClearFlag(RTC_FLAG_ALR);
+  SysTick->CTRL &= 0xFFFFFFFD;	//Disable SysTick interrupt to prevent waking up board
   PWR_EnterSTOPMode(PWR_Regulator_LowPower,PWR_STOPEntry_WFI);
+
+  /* Reinit RCC after exit from stop mode*/
+  SysTick->CTRL |= 0x00000002;	//Enable SysTick interrupt
   //turnON radio led
   leds_radio_on();
-
   if(sleepTime > 0)
   opentimers_sleepTimeCompesation(sleepTime*2);
 #endif 
