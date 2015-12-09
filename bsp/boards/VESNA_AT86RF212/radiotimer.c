@@ -220,6 +220,7 @@ kick_scheduler_t radiotimer_isr() {
          }
          break;
       case RADIOTIMER_NONE:                     // this should not happen
+    	  return;
       default:
          while(1);                               // this should not happen
    }
