@@ -8,13 +8,14 @@
 //=========================== defines =========================================
 
 //=========================== variables =======================================
-
+SNC_Clock	rcc_freq;
 //=========================== prototypes ======================================
 
 //=========================== public ==========================================
 
 void RCC_Configuration(SNC_Clock freq)
 {
+	rcc_freq = freq;
 	uint32_t multiplier;
 	/* RCC system reset(for debug purpose) */
 	RCC_DeInit();
@@ -248,6 +249,6 @@ void RCC_Configuration(SNC_Clock freq)
 //when wakeup by alarm, configure rcc
 void RCC_Wakeup(void)
 {
-	//do nothing using HSI
+	RCC_Configuration(rcc_freq);
 }
 
