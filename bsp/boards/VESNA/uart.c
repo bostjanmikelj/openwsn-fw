@@ -18,6 +18,12 @@
 //=========================== defines =========================================
 
 //=========================== variables =======================================
+typedef struct {
+   uart_tx_cbt txCb;
+   uart_rx_cbt rxCb;
+   uint8_t     startOrend;
+   uint8_t     flagByte;
+} uart_vars_t;
 
 volatile uart_vars_t uart_vars;
 
@@ -30,9 +36,14 @@ void uart_init()
   // reset local variables
   memset(&uart_vars,0,sizeof(uart_vars_t));
 
+  //when this value is 0, we are send the first data
+  uart_vars.startOrend = 0;
+  //flag byte for start byte and end byte
+  uart_vars.flagByte = 0x7E;
+
   GPIO_InitTypeDef GPIO_InitStructure;
   USART_InitTypeDef USART_InitStructure;
-  uart_vars.isFirst = TRUE;
+
   /* Enable GPIO clock */
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_AFIO, ENABLE);
 
@@ -92,21 +103,19 @@ void uart_clearTxInterrupts()
 
 void uart_writeByte(uint8_t byteToWrite)
 {
-	if ((uart_vars.rxCb==NULL)&&(uart_vars.txCb==NULL)){
-		//polling
-		USART_SendData(USART1, byteToWrite);
-		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-		return;
-	}
-	if(uart_vars.isFirst){
-		USART_SendData(USART1, byteToWrite);
-		while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
-		uart_vars.isFirst = FALSE;
-		USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
-	}
-	else {
-		USART_SendData(USART1, byteToWrite);
-	}
+  USART_SendData(USART1, byteToWrite);
+  while(USART_GetFlagStatus(USART1, USART_FLAG_TXE) == RESET);
+
+  //start or end byte?
+  if(byteToWrite == uart_vars.flagByte) {
+    uart_vars.startOrend = (uart_vars.startOrend == 0)?1:0;
+    //start byte
+    if(uart_vars.startOrend == 1) {
+      USART_ITConfig(USART1, USART_IT_TXE, ENABLE);
+    } else {
+      USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
+    }
+  }
 }
 
 uint8_t uart_readByte()

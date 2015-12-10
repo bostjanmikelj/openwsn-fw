@@ -27,7 +27,7 @@ TeraTerm):
 //=========================== defines =========================================
 
 #define BSP_TIMER_PERIOD     0xffff // 0xffff@32kHz = 2s
-uint8_t stringToSend[]       = "Hello, World!\r\n";
+uint8_t stringToSend[]       = "~Hello, World!\r\n~";
 
 //=========================== variables =======================================
 
@@ -58,13 +58,15 @@ int mote_main(void) {
    // initialize the board
    board_init();
    
+   // setup UART
+     uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
+     uart_enableInterrupts();
+
    // setup BSP timer
    bsp_timer_set_callback(cb_compare);
    bsp_timer_scheduleIn(BSP_TIMER_PERIOD);
 
-   // setup UART
-   uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
-   uart_enableInterrupts();
+
    while(1) {
       // wait for timer to elapse
       while (app_vars.uartSendNow==0);
@@ -90,12 +92,10 @@ void cb_compare(void) {
 
 void cb_uartTxDone(void) {
    app_vars.uart_lastTxByteIndex++;
-   if (app_vars.uart_lastTxByteIndex<sizeof(stringToSend)) {
+   if (app_vars.uart_lastTxByteIndex<sizeof(stringToSend)-1) {
       uart_writeByte(stringToSend[app_vars.uart_lastTxByteIndex]);
    } else {
-	  USART_ITConfig(USART1, USART_IT_TXE, DISABLE);
       app_vars.uartDone = 1;
-      uart_vars.isFirst = TRUE;
    }
 }
 
