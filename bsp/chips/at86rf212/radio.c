@@ -284,7 +284,6 @@ void radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting) {
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_LAST);
-   while (spi_isBusy()==1){}
 }
 
 uint8_t radio_spiReadReg(uint8_t reg_addr) {
@@ -302,7 +301,6 @@ uint8_t radio_spiReadReg(uint8_t reg_addr) {
             SPI_FIRST,
             SPI_LAST);
 
-  while (spi_isBusy()==1){}
   return spi_rx_buffer[1];
 }
 
@@ -322,7 +320,6 @@ void radio_spiWriteTxFifo(uint8_t* bufToWrite, uint8_t  lenToWrite) {
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_NOTLAST);
-   while (spi_isBusy()==1){}
    spi_txrx(bufToWrite,
             lenToWrite,
             SPI_BUFFER,
@@ -330,7 +327,6 @@ void radio_spiWriteTxFifo(uint8_t* bufToWrite, uint8_t  lenToWrite) {
             sizeof(spi_rx_buffer),
             SPI_NOTFIRST,
             SPI_LAST);
-   while (spi_isBusy()==1){}
 }
 
 
@@ -358,7 +354,6 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_NOTLAST);
-   while (spi_isBusy()==1){}
    *pLenRead  = spi_rx_buffer[1];
 
    if (*pLenRead>2 && *pLenRead<=127) {
@@ -372,7 +367,6 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                125,
                SPI_NOTFIRST,
                SPI_NOTLAST);
-      while (spi_isBusy()==1){}
       // CRC (2B) and LQI (1B)
       spi_txrx(spi_tx_buffer,
                2+1,
@@ -381,7 +375,6 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                3,
                SPI_NOTFIRST,
                SPI_LAST);
-      while (spi_isBusy()==1){}
       *pLqi   = spi_rx_buffer[2];
 
    } else {
@@ -396,7 +389,6 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                SPI_NOTFIRST,
                SPI_LAST);
    }
-   while (spi_isBusy()==1){}
 }
 
 //=========================== callbacks =======================================
