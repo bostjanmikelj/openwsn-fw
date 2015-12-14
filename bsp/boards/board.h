@@ -32,6 +32,9 @@ void board_init(void);
 void board_sleep(void);
 void board_reset(void);
 
+void board_timeDelayMS(uint32_t msec);
+void board_timeDelayDecrement (void);
+
 /**
 \}
 \}

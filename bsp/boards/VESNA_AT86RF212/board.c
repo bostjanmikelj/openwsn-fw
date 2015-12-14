@@ -19,6 +19,7 @@
 #include "gpio.h"
 #include "board.h"
 
+#define SYS_TICK_DIV	1000
 static __IO uint32_t boardTimingDelayMS = 0;
 //=========================== private functions ==============================
 
