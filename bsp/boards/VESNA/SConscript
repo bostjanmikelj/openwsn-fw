@@ -16,19 +16,12 @@ rf231 = localEnv.SConscript(
     exports     = {'env': env},
 )
 
-target   = 'libbsp'
-bsp_dir  = os.path.join('#','bsp','boards','VESNA')
 source   = \
     Glob('*.c') + \
     Glob('*.s') + \
     Glob('configure/*.c') + \
-    Glob('library/STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/STM32F10x_StdPeriph_Driver/src/*.c') + \
-    [rf231]
+    Glob('library/STM32F10x_StdPeriph_Lib_V3.5.0/Libraries/STM32F10x_StdPeriph_Driver/src/*.c')
 
+board  = localEnv.Object(source=source) + rf231
 
-libbsp = localEnv.Library(
-    target=target,
-    source=source,
-)
-
-Alias('libbsp', libbsp)
+Return('board')
