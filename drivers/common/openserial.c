@@ -449,6 +449,9 @@ void openserial_stop() {
    ENABLE_INTERRUPTS();
 }
 
+#ifdef GOLDEN_IMAGE_NONE
+void openserial_goldenImageCommands(void){};//do nothing
+#else
 void openserial_goldenImageCommands(void){
    uint8_t  input_buffer[7];
    uint8_t  numDataBytes;
@@ -488,7 +491,7 @@ void openserial_goldenImageCommands(void){
 #endif
    commandId  = openserial_vars.inputBuf[3];
    commandLen = openserial_vars.inputBuf[4];
-   
+
    if (commandLen>2 || commandLen == 0) {
        // the max command Len is 2, except ping commands
        return;
@@ -498,10 +501,10 @@ void openserial_goldenImageCommands(void){
        } else {
            // commandLen == 2
            comandParam_16 = (openserial_vars.inputBuf[5]      & 0x00ff) | \
-                            ((openserial_vars.inputBuf[6]<<8) & 0xff00); 
+                            ((openserial_vars.inputBuf[6]<<8) & 0xff00);
        }
    }
-   
+
    switch(commandId) {
        case COMMAND_SET_EBPERIOD:
            sixtop_setEBPeriod(comandParam_8); // one byte, in seconds
@@ -538,7 +541,7 @@ void openserial_goldenImageCommands(void){
                if (comandParam_8 == 0) {
                   ieee154e_setIsSecurityEnabled(FALSE);
                } else {
-                   // security only can be 1 or 0 
+                   // security only can be 1 or 0
                    break;
                }
            }
@@ -563,7 +566,7 @@ void openserial_goldenImageCommands(void){
            break;
    }
 }
-
+#endif
 /**
 \brief Trigger this module to print status information, over serial.
 
