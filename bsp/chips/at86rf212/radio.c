@@ -41,18 +41,15 @@ uint8_t radio_spiReadRadioInfo(void);
 //===== admin
 
 void radio_init() {
-	uint8_t regVal = 0;
 	// clear variables
 	memset(&radio_vars,0,sizeof(radio_vars_t));
 	// change state
 	radio_vars.state          = RADIOSTATE_STOPPED;
-	// configure the radio
-	regVal = radio_spiReadReg(RG_TRX_STATUS);
-	radio_spiWriteReg(RG_TRX_STATE, CMD_FORCE_TRX_OFF);    // turn radio off}
+
+	radio_spiWriteReg(RG_TRX_STATE, CMD_FORCE_TRX_OFF);    // turn radio off
 	//busy wait until radio status is TRX_OFF
-	while ((regVal&0x1F)!=TRX_OFF){
-		regVal = radio_spiReadReg(RG_TRX_STATUS);
-	}
+	while((radio_spiReadReg(RG_TRX_STATUS) & 0x1F) != TRX_OFF);
+
 	regVal = radio_spiReadReg(RG_IRQ_STATUS);                       // deassert the interrupt pin in case is high
 	radio_spiWriteReg(RG_IRQ_MASK,
 			(AT_IRQ_RX_START| AT_IRQ_TRX_END));  // tell radio to fire interrupt on TRX_END and RX_START
