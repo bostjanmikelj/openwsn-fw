@@ -84,7 +84,12 @@ void radio_setEndFrameCb(radiotimer_capture_cbt cb) {
 //===== reset
 
 void radio_reset() {
-   PORT_PIN_RADIO_RESET_LOW();
+	PORT_PIN_RADIO_RESET_LOW();
+	PORT_PIN_RADIO_SLP_TR_CNTL_LOW();
+	PORT_PIN_RADIO_SEL_HIGH();
+	for (uint16_t i=0;i<0xFFFF;i++);
+	PORT_PIN_RADIO_RESET_HIGH();
+	for (uint16_t i=0;i<0xFFFF;i++);
 }
 
 //===== timer
@@ -119,7 +124,7 @@ void radio_setFrequency(uint8_t frequency) {
 }
 
 void radio_rfOn() {
-   PORT_PIN_RADIO_RESET_LOW();
+   //PORT_PIN_RADIO_RESET_LOW();
 }
 
 void radio_rfOff() {
