@@ -101,6 +101,8 @@ int mote_main(void) {
    // start bsp timer
    bsp_timer_set_callback(cb_timer);
    bsp_timer_scheduleIn(TIMER_PERIOD);
+   //start radio_timer
+   radiotimer_start(0xFFFF);
    
    // prepare radio
    radio_rfOn();
