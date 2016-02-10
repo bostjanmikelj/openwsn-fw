@@ -7,7 +7,7 @@ sys.path.insert(0,os.path.join(here,'..','..','..','coap'))
 from coap import coap
 import signal
 
-MOTE_IP = 'bbbb::1415:92cc:0:2'
+MOTE_IP = 'bbbb::36ff:17ff:3143:3539'
 
 c = coap.coap()
 
