@@ -9,7 +9,7 @@
 
 //=========================== defines =========================================
 // stm32f103rey, 96-bit unique ID address
-#define UNIQUE_ID_BASE_ADDRESS          0x1FFFF7E8
+#define UNIQUE_ID_BASE_ADDRESS          0x1FFFF7E8	//Unique ID of proccessor used as MAC???
 
 //=========================== variables =======================================
 
