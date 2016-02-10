@@ -79,7 +79,7 @@ typedef struct {
    uint8_t    mode;
    uint8_t    debugPrintCounter;
    // input
-   uint8_t    reqFrame[1+1+2+1]; // flag (1B), command (2B), CRC (2B), flag (1B)
+   uint8_t    reqFrame[1+2+2+1]; // flag (1B), command (2B), CRC (2B), flag (1B)
    uint8_t    reqFrameIdx;
    uint8_t    lastRxByte;
    bool       busyReceiving;
