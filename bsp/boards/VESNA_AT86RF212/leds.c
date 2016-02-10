@@ -86,13 +86,13 @@ uint8_t leds_error_isOn()
   return bitstatus;
 }
 void leds_error_blink() {
-	/*turn OFF error LED*/
-	leds_error_off();
-	leds_error_toggle();
-	/*delay 10ms */
-	board_timeDelayMS(100);
-	leds_error_toggle();
-	board_timeDelayMS(100);
+//	/*turn OFF error LED*/
+//	leds_error_off();
+//	leds_error_toggle();
+//	/*delay 10ms */
+//	board_timeDelayMS(100);
+//	leds_error_toggle();
+//	board_timeDelayMS(100);
 }
 
 // green
