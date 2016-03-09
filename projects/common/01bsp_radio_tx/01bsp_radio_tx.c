@@ -18,6 +18,7 @@ remainder of the packet contains an incrementing bytes.
 #include "radio.h"
 #include "leds.h"
 #include "bsp_timer.h"
+#include "debugpins.h"
 
 //=========================== defines =========================================
 
@@ -79,9 +80,10 @@ int mote_main(void) {
    
    // start periodic overflow
    radiotimer_start(TIMER_PERIOD);
-   
+   debugpins_slot_clr();
+   debugpins_user_clr();
+   debugpins_fsm_clr();
    while(1) {
-      
       // wait for timer to elapse
       app_vars.txpk_txNow = 0;
       while (app_vars.txpk_txNow==0) {
@@ -98,10 +100,12 @@ int mote_main(void) {
       for (i=1;i<app_vars.txpk_len;i++) {
          app_vars.txpk_buf[i] = i;
       }
-      
+      debugpins_user_set();
+      radio_setFrequency(CHANNEL);
       // send packet
       radio_loadPacket(app_vars.txpk_buf,app_vars.txpk_len);
       radio_txEnable();
+      debugpins_user_clr();
       radio_txNow();
    }
 }
@@ -115,16 +119,15 @@ void cb_radioTimerCompare(void) {
 }
 
 void cb_radioTimerOverflows(void) {
-   
+	debugpins_slot_toggle();
    // update debug vals
    app_dbg.num_radioTimerOverflows++;
-   
    // ready to send next packet
    app_vars.txpk_txNow = 1;
 }
 
 void cb_startFrame(PORT_TIMER_WIDTH timestamp) {
-   
+   debugpins_fsm_set();
    // update debug vals
    app_dbg.num_startFrame++;
    
@@ -133,7 +136,7 @@ void cb_startFrame(PORT_TIMER_WIDTH timestamp) {
 }
 
 void cb_endFrame(PORT_TIMER_WIDTH timestamp) {
-   
+   debugpins_fsm_clr();
    // update debug vals
    app_dbg.num_endFrame++;
    

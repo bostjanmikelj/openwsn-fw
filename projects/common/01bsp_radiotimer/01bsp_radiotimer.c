@@ -27,9 +27,9 @@ Each time a radiotimer compare event happens:
 
 //=========================== defines =========================================
 
-#define RADIOTIMER_OVERFLOW_PERIOD      20000
-#define RADIOTIMER_COMPARE_PERIOD        2000
-#define RADIOTIMER_NUM_COMPARES             4
+#define RADIOTIMER_OVERFLOW_PERIOD      491
+#define RADIOTIMER_COMPARE_PERIOD       100
+#define RADIOTIMER_NUM_COMPARES         4
 
 //=========================== variables =======================================
 
@@ -46,6 +46,8 @@ typedef struct {
 } app_dbg_t;
 
 app_dbg_t app_dbg;
+
+uint16_t cntValue = 0;
 
 //=========================== prototypes ======================================
 
@@ -86,10 +88,10 @@ void cb_overflow(void) {
    
    // toggle pin
    debugpins_frame_toggle();
-   
+   debugpins_fsm_toggle();
    // switch radio LED on
    leds_error_toggle();
-   
+   radiotimer_cancel();
    // reset the counter for number of remaining compares
    app_vars.num_compares_left  = RADIOTIMER_NUM_COMPARES;
    app_vars.last_compare_val   = RADIOTIMER_COMPARE_PERIOD;
@@ -103,7 +105,7 @@ void cb_compare(void) {
    
    // toggle pin
    debugpins_slot_toggle();
-   
+   debugpins_fsm_toggle();
    // toggle radio LED
    leds_radio_toggle();
    
@@ -114,6 +116,7 @@ void cb_compare(void) {
       radiotimer_schedule(app_vars.last_compare_val);
    } else {
       radiotimer_cancel();
+      cntValue = radiotimer_getValue();
    }
    
    // increment debug counter

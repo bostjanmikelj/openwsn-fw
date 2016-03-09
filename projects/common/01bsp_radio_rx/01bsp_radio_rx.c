@@ -68,13 +68,14 @@ len=17  num=84  rssi=-81  lqi=108 crc=1
 #include "radio.h"
 #include "leds.h"
 #include "uart.h"
+#include "debugpins.h"
 
 //=========================== defines =========================================
 
 #define LENGTH_PACKET        125+LENGTH_CRC ///< maximum length is 127 bytes
-#define CHANNEL              20             ///< 11 = 2.405GHz
+#define CHANNEL              11             ///< 11 = 2.405GHz
 #define LENGTH_SERIAL_FRAME  8              ///< length of the serial frame
-
+#define TIMER_PERIOD    32768   			// (32768>>1) = 500ms @ 32kHz
 //=========================== variables =======================================
 
 typedef struct {
@@ -133,7 +134,7 @@ int mote_main(void) {
    radio_setCompareCb(cb_radioTimerCompare);
    radio_setStartFrameCb(cb_startFrame);
    radio_setEndFrameCb(cb_endFrame);
-   
+   radiotimer_start(TIMER_PERIOD);
    // setup UART
    uart_setCallbacks(cb_uartTxDone,cb_uartRxCb);
    
@@ -209,13 +210,13 @@ void cb_radioTimerCompare(void) {
 //===== radio
 
 void cb_startFrame(PORT_TIMER_WIDTH timestamp) {
-   
+   debugpins_user_set();
    // update debug stats
    app_dbg.num_startFrame++;
 }
 
 void cb_endFrame(PORT_TIMER_WIDTH timestamp) {
-   
+	debugpins_user_clr();
    // update debug stats
    app_dbg.num_endFrame++;
    // indicate I just received a packet

@@ -29,6 +29,12 @@ int mote_main(void) {
    board_init();
    leds_error_on();
    
+   debugpins_user_set();    some_delay();
+   debugpins_user_toggle(); some_delay();
+   debugpins_user_toggle(); some_delay();
+   debugpins_user_clr();    some_delay();
+
+
    debugpins_frame_set();    some_delay();
    debugpins_frame_toggle(); some_delay();
    debugpins_frame_toggle(); some_delay();
