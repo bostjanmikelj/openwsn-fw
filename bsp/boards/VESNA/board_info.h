@@ -33,7 +33,7 @@ to return the board's description.
 
 #define PORT_SIGNED_INT_WIDTH               int16_t
 #define PORT_TICS_PER_MS                    32
-#define SCHEDULER_WAKEUP()                  EXTI->SWIER |= EXTI_Line1;
+#define SCHEDULER_WAKEUP()                  //EXTI->SWIER |= EXTI_Line1;
 #define SCHEDULER_ENABLE_INTERRUPT()        //enable in board use EXTI_Line1
 
 //===== pinout
@@ -53,12 +53,12 @@ to return the board's description.
 // time-slot related
 #define PORT_TsSlotDuration                 491   // counter counts one extra count, see datasheet
 // execution speed related
-#define PORT_maxTxDataPrepare               66    // 2014us (measured 746us)
-#define PORT_maxRxAckPrepare                20    //  305us (measured  83us)
+#define PORT_maxTxDataPrepare               66//66    // 2014us (measured 746us)
+#define PORT_maxRxAckPrepare                20//20    //  305us (measured  83us)
 #define PORT_maxRxDataPrepare               33    // 1007us (measured  84us)
 #define PORT_maxTxAckPrepare                30    //  305us (measured 219us)
 // radio speed related
-#define PORT_delayTx                        10     //  214us (measured 219us)
+#define PORT_delayTx                        9     //  214us (measured 219us)
 #define PORT_delayRx                        0     //    0us (can not measure)
 // radio watchdog
 
