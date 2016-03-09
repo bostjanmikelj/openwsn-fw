@@ -291,7 +291,7 @@ elif env['toolchain']=='armgcc':
         env.Replace(NM           = 'arm-none-eabi-nm')
         env.Replace(SIZE         = 'arm-none-eabi-size')
         
-    elif env['board'] in ['VESNA', 'VESNA_AT86RF212']:
+    elif env['board'] in ['VESNA']:
     
        # compiler (C)
         env.Replace(CC           = 'arm-none-eabi-gcc')
