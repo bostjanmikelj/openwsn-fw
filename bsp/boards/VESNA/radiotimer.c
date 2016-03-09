@@ -77,7 +77,7 @@ void radiotimer_start(uint16_t period) {
     // Wait for RTC APB registers synchronisation 
     RTC_WaitForSynchro();
     
-    RTC_SetPrescaler(1);                              //use 16KHz clock
+    RTC_SetPrescaler(0);                              //use 32KHz clock
     RTC_WaitForLastTask();                            //Wait until last write operation on RTC registers has finished
 
     //Set the RTC time counter to 0
@@ -205,14 +205,16 @@ kick_scheduler_t radiotimer_isr() {
          break;
       case RADIOTIMER_OVERFLOW: // timer overflows
          if (radiotimer_vars.overflow_cb!=NULL) {
-           
+//        	 uint16_t cTime = radiotimer_getCapturedTime();
+//        	 if (cTime < PORT_TsSlotDuration){
+//        		 while(1);
+//        	 }
             //Wait until last write operation on RTC registers has finished
             RTC_WaitForLastTask();                            
-            
             //Set the RTC time counter to 0
             RTC_SetCounter(0x00000000);
             RTC_WaitForLastTask();
-            RCC_Wakeup();
+            //RCC_Wakeup();
             // call the callback
             radiotimer_vars.overflow_cb();
             // kick the OS

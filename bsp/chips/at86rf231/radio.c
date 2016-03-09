@@ -181,7 +181,6 @@ void radio_txNow() {
    // send packet by pulsing the SLP_TR_CNTL pin
    PORT_PIN_RADIO_SLP_TR_CNTL_HIGH();
    PORT_PIN_RADIO_SLP_TR_CNTL_LOW();
-   
    // The AT86RF231 does not generate an interrupt when the radio transmits the
    // SFD, which messes up the MAC state machine. The danger is that, if we leave
    // this funtion like this, any radio watchdog timer will expire.
