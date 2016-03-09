@@ -13,6 +13,7 @@
 #define DEBUG_TASK_PIN           (1<<4)
 #define DEBUG_ISR_PIN            (1<<5)
 #define DEBUG_RADIO_PIN          (1<<6)
+#define DEBUG_USER_PIN			 (1)
 #define DEBUG_PORT 				  GPIOA
 //=========================== variables =======================================
 
@@ -28,7 +29,7 @@ void debugpins_init() {
 	/* Enable debug port clock*/
 	RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA , ENABLE);
 	/* Init debug pins*/
-	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6;
+	GPIO_InitStructure.GPIO_Pin = GPIO_Pin_1|GPIO_Pin_2|GPIO_Pin_3|GPIO_Pin_4|GPIO_Pin_5|GPIO_Pin_6|GPIO_Pin_0;
 	GPIO_InitStructure.GPIO_Mode = GPIO_Mode_Out_PP;
 	GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
 	GPIO_Init(GPIOA, &GPIO_InitStructure);
@@ -93,5 +94,15 @@ void debugpins_radio_clr() {
 }
 void debugpins_radio_set() {
 	DEBUG_PORT->ODR |= DEBUG_RADIO_PIN;
+}
+
+void debugpins_user_toggle() {
+	DEBUG_PORT->ODR ^= DEBUG_USER_PIN;
+}
+void debugpins_user_clr() {
+	DEBUG_PORT->ODR &= ~DEBUG_USER_PIN;
+}
+void debugpins_user_set() {
+	DEBUG_PORT->ODR |= DEBUG_USER_PIN;
 }
 
