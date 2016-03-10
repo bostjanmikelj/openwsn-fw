@@ -35,6 +35,7 @@ void scheduler_start() {
    taskList_item_t* pThisTask;
    while (1) {
       while(scheduler_vars.task_list!=NULL) {
+    	 debugpins_task_set();
          // there is still at least one task in the linked-list of tasks
          
          // the task to execute is the one at the head of the queue
@@ -51,10 +52,11 @@ void scheduler_start() {
          pThisTask->prio          = TASKPRIO_NONE;
          pThisTask->next          = NULL;
          scheduler_dbg.numTasksCur--;
+         debugpins_task_clr();
       }
-      debugpins_task_clr();
+
       board_sleep();
-      debugpins_task_set();                      // IAR should halt here if nothing to do
+                            // IAR should halt here if nothing to do
    }
 }
 
