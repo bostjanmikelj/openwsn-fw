@@ -979,6 +979,8 @@ port_INLINE void activity_ti2() {
    
    // change state
    changeState(S_TXDATAPREPARE);
+   // arm tt2
+   radiotimer_schedule(DURATION_tt2);
 
    // make a local copy of the frame
    packetfunctions_duplicatePacket(&ieee154e_vars.localCopyForTransmission, ieee154e_vars.dataToSend);
@@ -1010,9 +1012,7 @@ port_INLINE void activity_ti2() {
    radio_txEnable();
    ieee154e_vars.radioOnInit=radio_getTimerValue();
    ieee154e_vars.radioOnThisSlot=TRUE;
-   // arm tt2
-   radiotimer_schedule(DURATION_tt2);
-   
+
    // change state
    changeState(S_TXDATAREADY);
 }
@@ -1329,6 +1329,8 @@ port_INLINE void activity_ti9(PORT_RADIOTIMER_WIDTH capturedTime) {
 port_INLINE void activity_ri2() {
    // change state
    changeState(S_RXDATAPREPARE);
+   // arm rt2
+   radiotimer_schedule(DURATION_rt2);
    
    // calculate the frequency to transmit on
    ieee154e_vars.freq = calculateFrequency(schedule_getChannelOffset()); 
@@ -1341,8 +1343,7 @@ port_INLINE void activity_ri2() {
    ieee154e_vars.radioOnInit=radio_getTimerValue();
    ieee154e_vars.radioOnThisSlot=TRUE;
    
-   // arm rt2
-   radiotimer_schedule(DURATION_rt2);
+
        
    // change state
    changeState(S_RXDATAREADY);
