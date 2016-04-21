@@ -23,6 +23,7 @@
 //=========================== prototypes ======================================
 
 void eui64_get(uint8_t* addressToWrite);
+void uid96_get (uint8_t* uniqueID);
 
 /**
 \}

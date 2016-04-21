@@ -36,4 +36,22 @@ void eui64_get(uint8_t* addressToWrite)
   addressToWrite[7] = (uid[7]^luid[7]);
 }
 
+/* Gets proccessor 96-bytes unique id*/
+
+void uid96_get (uint8_t* uniqueID) {
+	uniqueID[0] = uid[0];
+	uniqueID[1] = uid[1];
+	uniqueID[2] = uid[2];
+	uniqueID[3] = uid[3];
+	uniqueID[4] = uid[4];
+	uniqueID[5] = uid[5];
+	uniqueID[6] = uid[6];
+	uniqueID[7] = uid[7];
+	uniqueID[8] = uid[8];
+	uniqueID[9] = uid[9];
+	uniqueID[10] = uid[10];
+	uniqueID[11] = uid[11];
+
+}
+
 //=========================== private =========================================
