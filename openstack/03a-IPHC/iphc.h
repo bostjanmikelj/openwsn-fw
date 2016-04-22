@@ -251,6 +251,38 @@ owerror_t iphc_prependIPv6Header(
    uint8_t              fw_SendOrfw_Rcv
 );
 
+void iphc_retrieveIPv6Header(
+		OpenQueueEntry_t* msg,
+		ipv6_header_iht* ipv6_outer_header,
+		ipv6_header_iht* ipv6_inner_header,
+		uint8_t* page_length
+);
+
+uint8_t iphc_retrieveIphcHeader(open_addr_t* temp_addr_16b,
+    open_addr_t*         temp_addr_64b,
+    uint8_t*             dispatch,
+    uint8_t*             tf,
+    bool*                nh,
+    uint8_t*             hlim,
+    uint8_t*             sam,
+    uint8_t*             m,
+    uint8_t*             dam,
+    OpenQueueEntry_t*    msg,
+    ipv6_header_iht*     ipv6_header,
+    uint8_t              previousLen
+);
+
+void iphc_prependIPv6HopByHopHeader(
+      OpenQueueEntry_t* msg,
+      uint8_t           nextheader,
+      rpl_option_ht*    rpl_option
+);
+
+uint8_t iphc_retrieveIPv6HopByHopHeader(
+      OpenQueueEntry_t*      msg,
+      rpl_option_ht*         rpl_option
+);
+
 /**
 \}
 \}
