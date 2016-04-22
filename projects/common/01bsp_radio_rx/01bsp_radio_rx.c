@@ -155,14 +155,9 @@ int mote_main(void) {
       
       // if I get here, I just received a packet
       
-      //===== get packet from radio
-      
-      // led
-
-      
       //===== send notification over serial port
       
-      // // led
+      // led
       leds_error_on();
       
       // format frame to send over serial port
@@ -221,7 +216,7 @@ void cb_endFrame(PORT_TIMER_WIDTH timestamp) {
    app_dbg.num_endFrame++;
    // indicate I just received a packet
    app_vars.rxpk_done = 1;
-
+   
    leds_sync_on();
 
    // get packet from radio
@@ -233,10 +228,10 @@ void cb_endFrame(PORT_TIMER_WIDTH timestamp) {
       &app_vars.rxpk_lqi,
       &app_vars.rxpk_crc
    );
-
+   
    // read the packet number
    app_vars.rxpk_num = app_vars.rxpk_buf[0];
-
+   
    // led
    leds_sync_off();
 }
