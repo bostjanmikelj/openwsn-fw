@@ -75,7 +75,7 @@ owerror_t cleds_receive(
          packetfunctions_reserveHeaderSize(msg,2);
          msg->payload[0]                  = COAP_PAYLOAD_MARKER;
 
-         if (leds_error_isOn()==1) {
+         if (leds_sync_isOn()==1) {
             msg->payload[1]               = '1';
          } else {
             msg->payload[1]               = '0';
@@ -91,11 +91,11 @@ owerror_t cleds_receive(
       
          // change the LED's state
          if (msg->payload[0]=='1') {
-            leds_error_on();
+        	 leds_sync_on();
          } else if (msg->payload[0]=='2') {
-            leds_error_toggle();
+        	 leds_sync_toggle();
          } else {
-            leds_error_off();
+        	 leds_sync_off();
          }
          
          // reset packet payload
