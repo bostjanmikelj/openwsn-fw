@@ -24,7 +24,7 @@ typedef struct {
 } radio_vars_t;
 
 radio_vars_t radio_vars;
-
+bool radio_transInProgress = FALSE;
 //=========================== prototypes ======================================
 
 void    radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting);
@@ -35,13 +35,16 @@ void    radio_spiReadRxFifo(uint8_t* pBufRead,
                             uint8_t  maxBufLen,
                             uint8_t* pLqi);
 uint8_t radio_spiReadRadioInfo(void);
-
+void radio_spiCallback (void);
 //=========================== public ==========================================
 
 //===== admin
 
 void radio_init() {
-
+#ifdef SPI_IN_INTERRUPT_MODE
+   // set SPI callback
+	spi_setCb(radio_spiCallback);
+#endif
    // clear variables
    memset(&radio_vars,0,sizeof(radio_vars_t));
    
@@ -281,7 +284,7 @@ void radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting) {
    
    spi_tx_buffer[0] = (0xC0 | reg_addr);        // turn addess in a 'reg write' address
    spi_tx_buffer[1] = reg_setting;
-   
+   radio_transInProgress = TRUE;
    spi_txrx(spi_tx_buffer,
             sizeof(spi_tx_buffer),
             SPI_BUFFER,
@@ -289,6 +292,7 @@ void radio_spiWriteReg(uint8_t reg_addr, uint8_t reg_setting) {
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_LAST);
+   while (radio_transInProgress == TRUE);
 }
 
 uint8_t radio_spiReadReg(uint8_t reg_addr) {
@@ -297,7 +301,7 @@ uint8_t radio_spiReadReg(uint8_t reg_addr) {
    
    spi_tx_buffer[0] = (0x80 | reg_addr);        // turn addess in a 'reg read' address
    spi_tx_buffer[1] = 0x00;                     // send a no_operation command just to get the reg value
-   
+   radio_transInProgress = TRUE;
    spi_txrx(spi_tx_buffer,
             sizeof(spi_tx_buffer),
             SPI_BUFFER,
@@ -306,7 +310,7 @@ uint8_t radio_spiReadReg(uint8_t reg_addr) {
             SPI_FIRST,
             SPI_LAST);
    
-
+   while (radio_transInProgress == TRUE);
   return spi_rx_buffer[1];
 }
 
@@ -318,7 +322,7 @@ void radio_spiWriteTxFifo(uint8_t* bufToWrite, uint8_t  lenToWrite) {
    
    spi_tx_buffer[0] = 0x60;                      // SPI destination address for TXFIFO
    spi_tx_buffer[1] = lenToWrite;                // length byte
-   
+   radio_transInProgress = TRUE;
    spi_txrx(spi_tx_buffer,
             sizeof(spi_tx_buffer),
             SPI_BUFFER,
@@ -326,7 +330,8 @@ void radio_spiWriteTxFifo(uint8_t* bufToWrite, uint8_t  lenToWrite) {
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_NOTLAST);
-   
+   while (radio_transInProgress == TRUE);
+   radio_transInProgress = TRUE;
    spi_txrx(bufToWrite,
             lenToWrite,
             SPI_BUFFER,
@@ -334,6 +339,7 @@ void radio_spiWriteTxFifo(uint8_t* bufToWrite, uint8_t  lenToWrite) {
             sizeof(spi_rx_buffer),
             SPI_NOTFIRST,
             SPI_LAST);
+   while (radio_transInProgress == TRUE);
 }
 
 
@@ -352,7 +358,7 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
    uint8_t spi_rx_buffer[3];
    
    spi_tx_buffer[0] = 0x20;
-   
+   radio_transInProgress = TRUE;
    // 2 first bytes
    spi_txrx(spi_tx_buffer,
             2,
@@ -361,12 +367,12 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
             sizeof(spi_rx_buffer),
             SPI_FIRST,
             SPI_NOTLAST);
-   
+   while (radio_transInProgress == TRUE);
    *pLenRead  = spi_rx_buffer[1];
    
    if (*pLenRead>2 && *pLenRead<=127) {
       // valid length
-      
+	   radio_transInProgress = TRUE;
       //read packet
       spi_txrx(spi_tx_buffer,
                *pLenRead,
@@ -375,7 +381,8 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                125,
                SPI_NOTFIRST,
                SPI_NOTLAST);
-      
+      while (radio_transInProgress == TRUE);
+      radio_transInProgress = TRUE;
       // CRC (2B) and LQI (1B)
       spi_txrx(spi_tx_buffer,
                2+1,
@@ -384,12 +391,12 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                3,
                SPI_NOTFIRST,
                SPI_LAST);
-      
+      while (radio_transInProgress == TRUE);
       *pLqi   = spi_rx_buffer[2];
       
    } else {
       // invalid length
-      
+	   radio_transInProgress = TRUE;
       // read a just byte to close spi
       spi_txrx(spi_tx_buffer,
                1,
@@ -398,10 +405,15 @@ void radio_spiReadRxFifo(uint8_t* pBufRead,
                sizeof(spi_rx_buffer),
                SPI_NOTFIRST,
                SPI_LAST);
+      while (radio_transInProgress == TRUE);
    }
 }
 
 //=========================== callbacks =======================================
+
+void radio_spiCallback (void){
+	radio_transInProgress = FALSE;
+}
 
 //=========================== interrupt handlers ==============================
 
